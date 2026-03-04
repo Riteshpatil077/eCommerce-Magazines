@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { LayoutDashboard, BookOpen, Users, CreditCard, Settings, LogOut, PlusCircle } from "lucide-react"
+import LogoutButton from "../components/logout-btn"
 
 export default async function DashboardLayout({
   children,
@@ -36,6 +37,7 @@ export default async function DashboardLayout({
     { href: "/dashboard/user", label: "My Library", icon: BookOpen },
     { href: "/store", label: "Browse Store", icon: LayoutDashboard },
     { href: "/dashboard/user/billing", label: "Billing", icon: CreditCard },
+    { href: "/dashboard/user/cart", label: "Cart", icon: CreditCard },
   ]
 
   const navItems = isAdmin ? adminNav : userNav
@@ -106,13 +108,7 @@ export default async function DashboardLayout({
               <p className="text-[10px] text-white/30 capitalize">{decoded.role?.toLowerCase()}</p>
             </div>
           </div>
-          <Link
-            href="/api/auth/logout"
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-white/30 hover:text-red-400 hover:bg-red-400/5 transition-all duration-150 group"
-          >
-            <LogOut className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-            Sign out
-          </Link>
+          <LogoutButton />
         </div>
       </aside>
 

@@ -47,7 +47,7 @@ export async function registerAction(prevState: any, formData: FormData) {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   })
 
-  redirect("/store")
+  redirect("/dashboard/user")
 }
 
 export async function loginAction(prevState: any, formData: FormData) {
@@ -83,7 +83,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     redirect("/dashboard/admin")
   }
 
-  redirect("/store")
+  redirect("/dashboard/user")
 }
 
 export async function logoutAction() {
@@ -91,5 +91,5 @@ export async function logoutAction() {
 
   cookieStore.delete("token")
 
-  redirect("/login")
+  redirect("/")
 }

@@ -15,6 +15,7 @@ model User {
   role      Role     @default(USER)
   subscriptions Subscription[]
   createdAt DateTime @default(now())
+   carts     Cart[] 
 }
 
 model Magazine {
@@ -28,6 +29,7 @@ model Magazine {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   subscriptions Subscription[]
+   carts     Cart[] 
 }
 
 model Subscription {
@@ -48,6 +50,18 @@ model Subscription {
   magazine      Magazine @relation(fields: [magazineId], references: [id])
 
   @@unique([userId, magazineId])
+}
+
+model Cart {
+  id          String   @id @default(uuid())
+  userId      String
+  magazineId  String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  magazine    Magazine @relation(fields: [magazineId], references: [id])
+
+  @@unique([userId, magazineId]) // prevent duplicate cart items
 }
 
 enum Role {
