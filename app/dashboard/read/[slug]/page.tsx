@@ -1,54 +1,75 @@
 import { prisma } from "@/app/lib/prisma";
-import { redirect } from "next/navigation";
-import MagazineViewer from "@/app/components/magazineViewer";
+import { redirect, notFound } from "next/navigation";
 import { getUserFromToken } from "@/app/lib/auth";
+import ClientViewerBridge from "@/app/components/ClientViewerBridge";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
-export default async function ReadMagazinePage({ params }: { params: { id: string } }) {
-    // 1. In Next.js 15+, params must be awaited
-    const { id } = await params;
+export default async function ReadMagazinePage(props: { params: Promise<{ slug: string }> }) {
+    const { slug } = await props.params;
 
-    // 2. Authenticate the User
-    const user = await getUserFromToken() as { id: string } | null;
-    if (!user) redirect("/login");
+    // 1. Get the session (id/role) from token
+    const session = await getUserFromToken() as { id: string } | null;
+    if (!session) redirect("/login");
 
-    // 3. Fetch magazine using 'id' from folder name as the 'slug'
-    const magazine = await prisma.magazine.findUnique({
-        where: { slug: id },
-    });
+    // 2. Fetch the REAL user and magazine from DB in parallel
+    const [dbUser, magazine] = await Promise.all([
+        prisma.user.findUnique({ where: { id: session.id } }),
+        prisma.magazine.findUnique({ where: { slug: slug } })
+    ]);
 
-    // If magazine doesn't exist, go back to dashboard
-    if (!magazine) redirect("/dashboard");
+    if (!magazine || !dbUser) return notFound();
 
-    // 4. Check Subscription Status
-    // We check if isActive is true AND paymentStatus is APPROVED
+    // 3. Subscription Check
     const subscription = await prisma.subscription.findFirst({
         where: {
-            userId: user.id,
+            userId: dbUser.id,
             magazineId: magazine.id,
-            isActive: true,
             paymentStatus: "APPROVED",
+            isActive: true
         },
     });
 
-    // 5. Access Control
-    if (!subscription) {
-        // Redirect to the store page for this specific slug
-        redirect(`/store/${id}`);
-    }
+    if (subscription) redirect(`/store/${slug}`);
 
-    // 6. Render Flipbook
+    // Fallback name for the UI
+    const displayName = dbUser.name || dbUser.email.split('@')[0] || "Reader";
+
     return (
-        <div className="h-screen w-full bg-zinc-950 overflow-hidden relative">
-            {/* Premium Exit Button */}
-            <a
-                href="/dashboard"
-                className="absolute top-6 left-6 z-50 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white border border-white/10 px-5 py-2.5 rounded-full text-[10px] uppercase tracking-[2px] font-bold transition-all"
-            >
-                ← Back to Dashboard
-            </a>
+        <div className="flex h-screen bg-zinc-950 overflow-hidden text-white">
+            <div className="flex-1 flex flex-col relative">
 
-            {/* The Flipbook Viewer */}
-            <MagazineViewer pdfUrl={magazine.pdfUrl} />
+                {/* Header */}
+                <header className="h-16 flex items-center justify-between px-8 border-b border-white/5 bg-zinc-900/50 backdrop-blur-md z-20">
+                    <div className="flex items-center gap-6">
+                        <Link
+                            href="/dashboard/user"
+                            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-amber-400 transition-all group"
+                        >
+                            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                            Exit Reader
+                        </Link>
+                        <div className="h-6 w-px bg-white/10" />
+                        <h1 className="text-sm font-semibold text-white/90">{magazine.title}</h1>
+                    </div>
+
+                    {/* User Profile - Fixed split error by using dbUser */}
+                    <div className="flex items-center gap-4">
+                        <div className="text-right hidden sm:block">
+                            <p className="text-[10px] text-white/30 font-medium leading-none uppercase tracking-widest mb-1">Reading as</p>
+                            <p className="text-xs text-white/70">{displayName}</p>
+                        </div>
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-zinc-950 font-bold text-xs shadow-lg shadow-amber-400/10">
+                            {dbUser.email[0].toUpperCase()}
+                        </div>
+                    </div>
+                </header>
+
+                {/* Reader Area */}
+                <main className="flex-1 bg-[#0a0a0a] relative overflow-hidden">
+                    <ClientViewerBridge pdfUrl={magazine.pdfUrl} />
+                </main>
+            </div>
         </div>
     );
 }

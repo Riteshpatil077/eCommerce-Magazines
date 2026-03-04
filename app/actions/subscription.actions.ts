@@ -15,12 +15,26 @@ export async function subscribeAction(formData: FormData) {
 
   const user: any = jwt.verify(token!, process.env.JWT_SECRET!)
 
-  await prisma.subscription.create({
-    data: {
+  await prisma.subscription.upsert({
+    where: {
+      userId_magazineId: {
+        userId: user.id,
+        magazineId: magazineId,
+      },
+    },
+    update: {
+      isActive: true,
+      paymentStatus: "APPROVED", // Or keep as PENDING depending on your flow
+      updatedAt: new Date(),
+    },
+    create: {
       userId: user.id,
-      magazineId,
+      magazineId: magazineId,
+      isActive: true,
+      paymentStatus: "APPROVED",
     },
   })
-
-  redirect(`/magazine/${magazineId}`)
+  // Redirect back to the reader or a success page
+  const magazine = await prisma.magazine.findUnique({ where: { id: magazineId } })
+  redirect(`/dashboard/read/${magazine?.slug}`)
 }
