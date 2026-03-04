@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Upload, FileText, ImageIcon, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
+import { Upload, FileText, Package, ImageIcon, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
 
 export default function AddMagazinePage() {
   const router = useRouter()
@@ -14,6 +14,7 @@ export default function AddMagazinePage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [stock, setStock] = useState("") 
 
   async function handleUpload(file: File) {
     const formData = new FormData()
@@ -43,7 +44,8 @@ export default function AddMagazinePage() {
         body: JSON.stringify({ 
           title, 
           description, // Included description
-          price: parseFloat(price), 
+          price: parseFloat(price),
+          stock: parseInt(stock), 
           coverImage: coverUrl, 
           pdfUrl 
         }),
@@ -123,6 +125,24 @@ export default function AddMagazinePage() {
                   className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-8 pr-4 py-3 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+               <div className="space-y-2">
+              <label className="block text-xs tracking-[2px] uppercase text-white/40 font-medium">
+                Stock Quantity
+              </label>
+              <div className="relative">
+                <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400" />
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Enter available stock"
+                  className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm"
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
                   required
                 />
               </div>

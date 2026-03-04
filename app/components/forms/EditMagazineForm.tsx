@@ -1,8 +1,8 @@
 "use client"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Upload, FileText, ImageIcon, ArrowLeft, Loader2, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react"
+import { toast } from "react-hot-toast" 
 
 export default function EditMagazineForm({ magazine }: any) {
   const router = useRouter()
@@ -13,6 +13,7 @@ export default function EditMagazineForm({ magazine }: any) {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+   const [stock, setStock] = useState(magazine.stock || 0)
 
   async function uploadFile(file: File) {
     const formData = new FormData()
@@ -27,27 +28,47 @@ export default function EditMagazineForm({ magazine }: any) {
     e.preventDefault()
     setLoading(true)
     setError("")
+    
+    // Create a toast promise or a manual loading toast
+    const loadingToast = toast.loading("Updating magazine...")
+
     try {
       let coverUrl = magazine.coverImage
       let pdfUrl = magazine.pdfUrl
+      
+      // Handle file uploads if new files are selected
       if (coverImage) coverUrl = await uploadFile(coverImage)
       if (pdfFile) pdfUrl = await uploadFile(pdfFile)
 
       const res = await fetch(`/api/admin/magazines/${magazine.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, price: parseFloat(price), coverImage: coverUrl, pdfUrl }),
+        body: JSON.stringify({ 
+          title, 
+          price: parseFloat(price),
+          stock: parseInt(stock), 
+          coverImage: coverUrl, 
+          pdfUrl 
+        }),
       })
+
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
+
+      // SUCCESS TOAST
+      toast.success(`${title} updated successfully!`, { id: loadingToast })
+      
+      router.refresh()
       router.push("/dashboard/admin/magazines")
+      
     } catch (err: any) {
       setError(err.message)
+      // ERROR TOAST
+      toast.error(err.message || "Failed to update magazine", { id: loadingToast })
     } finally {
       setLoading(false)
     }
   }
-
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 p-6 md:p-12">
       <div className="max-w-2xl mx-auto">
@@ -133,6 +154,22 @@ export default function EditMagazineForm({ magazine }: any) {
                   required
                 />
               </div>
+            </div>
+
+              <div>
+              <label className="block text-xs uppercase text-white/40 mb-2">
+                Available Stock
+              </label>
+        
+<input
+  type="number"
+  min="0"
+  className="w-full bg-zinc-800 border border-white/5 rounded-xl px-4 py-3 text-sm"
+  value={stock}
+  // Use e.target.value directly; parseFloat/Int happens in handleSubmit
+  onChange={(e) => setStock(e.target.value)} 
+  required
+/>
             </div>
 
             {/* File uploads */}
