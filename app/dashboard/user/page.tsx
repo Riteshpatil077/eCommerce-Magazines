@@ -3,7 +3,7 @@ import DashboardCard from "@/app/components/user/DashboardCard";
 export default function UserDashboard() {
   return (
     // Added bg-black and text-white to the main container to fix the layout theme
-    <div className="space-y-6 bg-zinc-950/90 backdrop-blur-md text-white min-h-screen p-8">
+    <div className="space-y-6 bg-zinc-950/90 text-white min-h-screen p-8">
 
       <h2 className="text-2xl font-bold text-zinc-100">Overview</h2>
 

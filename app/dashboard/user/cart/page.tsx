@@ -24,7 +24,7 @@ export default async function CartPage() {
     })
 
     return (
-        <div className="min-h-screen bg-gray-900 p-10">
+        <div className="min-h-screen bg-zinc-900/50 border border-zinc-800 p-10">
             <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
 
             {cartItems.length === 0 ? (
@@ -34,7 +34,7 @@ export default async function CartPage() {
                     {cartItems.map((item: any) => (
                         <div
                             key={item.id}
-                            className="bg-white p-4 rounded-xl shadow flex justify-between"
+                            className="bg-gray-900 p-4 rounded-xl shadow flex justify-between"
                         >
                             <div>
                                 <h2 className="font-semibold">
