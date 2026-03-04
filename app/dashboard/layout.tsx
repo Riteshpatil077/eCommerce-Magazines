@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { LayoutDashboard, BookOpen, Users, CreditCard, Settings, LogOut, PlusCircle } from "lucide-react"
+
 import LogoutButton from "../components/logout-btn"
+
 
 export default async function DashboardLayout({
   children,
@@ -108,7 +110,9 @@ export default async function DashboardLayout({
               <p className="text-[10px] text-white/30 capitalize">{decoded.role?.toLowerCase()}</p>
             </div>
           </div>
+
           <LogoutButton />
+
         </div>
       </aside>
 

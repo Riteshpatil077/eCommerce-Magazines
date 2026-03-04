@@ -1,15 +1,19 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react" // Added useEffect
 import { loginAction } from "@/app/actions/auth.actions"
 import toast from "react-hot-toast"
 import Link from "next/link"
-import { Mail, Lock, ArrowRight, BookOpen } from "lucide-react"
+import { Mail, Lock, ArrowRight, BookOpen, Loader2 } from "lucide-react" // Added Loader2
 
 export default function LoginForm() {
-  const [state, formAction] = useActionState(loginAction, null)
+  const [state, formAction, isPending] = useActionState(loginAction, null)
 
-  if (state?.error) toast.error(state.error)
+  useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error)
+    }
+  }, [state])
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 flex items-center justify-center px-4">
@@ -50,6 +54,7 @@ export default function LoginForm() {
                   name="email"
                   type="email"
                   placeholder="you@example.com"
+                  required
                   className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
                 />
               </div>
@@ -61,9 +66,6 @@ export default function LoginForm() {
                 <label className="block text-xs tracking-[2px] uppercase text-white/40 font-medium">
                   Password
                 </label>
-                {/* <Link href="/forgot-password" className="text-[11px] text-amber-400/60 hover:text-amber-400 transition-colors duration-150">
-                  Forgot password?
-                </Link> */}
               </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" strokeWidth={1.5} />
@@ -71,6 +73,7 @@ export default function LoginForm() {
                   name="password"
                   type="password"
                   placeholder="••••••••"
+                  required
                   className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
                 />
               </div>
@@ -78,13 +81,23 @@ export default function LoginForm() {
 
             <div className="h-px bg-white/5" />
 
-            {/* Submit */}
+            {/* Submit Button with Pending State */}
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold text-sm py-3.5 rounded-xl tracking-wide transition-all duration-200 group"
+              disabled={isPending}
+              className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold text-sm py-3.5 rounded-xl tracking-wide transition-all duration-200 group"
             >
-              Sign in
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-150" />
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                <>
+                  Sign in
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-150" />
+                </>
+              )}
             </button>
 
           </form>

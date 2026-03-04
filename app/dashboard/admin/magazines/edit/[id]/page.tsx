@@ -26,15 +26,10 @@ export default async function EditMagazinePage({ params }: PageProps) {
 
   if (!magazine) return notFound()
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-10">
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow">
-        <h1 className="text-3xl font-bold mb-6">
-          Edit Magazine
-        </h1>
+  return <EditMagazineForm magazine={magazine} /> 
+    
 
-        <EditMagazineForm magazine={magazine} />
-      </div>
-    </div>
-  )
+       
+     
+  
 }

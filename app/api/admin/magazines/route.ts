@@ -42,6 +42,7 @@ while (await prisma.magazine.findUnique({ where: { slug } })) {
         coverImage: body.coverImage,
         pdfUrl: body.pdfUrl,
         price: Number(body.price),
+        stock: parseInt(body.stock),
       },
     })
 
