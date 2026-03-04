@@ -1,7 +1,7 @@
 "use client"
 
 import { Bell } from "lucide-react"
-import LogoutButton from "../loguot-btn"
+import LogoutButton from "../logout-btn"
 
 
 export default function UserTopbar() {

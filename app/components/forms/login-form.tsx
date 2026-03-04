@@ -31,6 +31,7 @@ export default function LoginForm() {
             </div>
             <span className="font-serif text-xl font-bold tracking-tight">Pressly</span>
           </Link>
+
           <p className="text-[11px] tracking-[3px] uppercase text-amber-400 font-medium mb-2">Welcome back</p>
           <h1 className="font-serif text-3xl font-normal tracking-tight">
             Sign <em className="italic text-amber-400">in</em>
