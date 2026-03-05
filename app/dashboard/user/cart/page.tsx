@@ -1,8 +1,11 @@
+<<<<<<< HEAD
 
 
 
 
 
+=======
+>>>>>>> 7ec27e84ab364b30e5e98ef167035dd1b9cb09dc
 
 import { prisma } from "@/app/lib/prisma"
 import { cookies } from "next/headers"
@@ -11,7 +14,12 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { removeFromCart } from "@/app/actions/cart.actions"
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Box } from "lucide-react"
+<<<<<<< HEAD
 import Image from "next/image"
+=======
+// import { processCheckout } from "@/app/actions/checkout.actions"
+
+>>>>>>> 7ec27e84ab364b30e5e98ef167035dd1b9cb09dc
 async function getUser() {
     const token = (await cookies()).get("token")?.value
     if (!token) return null
@@ -144,10 +152,13 @@ export default async function CartPage() {
                                     </div>
                                 </div>
 
-                                <button className="w-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-lg shadow-amber-400/10">
+                                <Link
+                                    href="/store/checkout"
+                                    className="w-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-lg shadow-amber-400/10"
+                                >
                                     <CreditCard className="w-5 h-5" />
                                     CHECKOUT NOW
-                                </button>
+                                </Link>
 
                                 <p className="text-[10px] text-center text-white/20 mt-6 uppercase tracking-[2px] font-bold">
                                     Secure SSL Encryption Included
