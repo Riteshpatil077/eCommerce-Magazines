@@ -21,11 +21,10 @@ export default function UserSidebar() {
           <Link
             key={item.name}
             href={item.href}
-            className={`flex items-center gap-3 p-3 rounded-lg transition ${
-              pathname === item.href
+            className={`flex items-center gap-3 p-3 rounded-lg transition ${pathname === item.href
                 ? "bg-indigo-600 text-white"
                 : "hover:bg-gray-200"
-            }`}
+              }`}
           >
             <item.icon size={18} />
             {item.name}
