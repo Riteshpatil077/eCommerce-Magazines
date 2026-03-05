@@ -1,59 +1,4 @@
-// import { prisma } from "@/app/lib/prisma"
-// import { cookies } from "next/headers"
-// import jwt from "jsonwebtoken"
-// import { redirect } from "next/navigation"
-// import { removeFromCart } from "@/app/actions/cart.actions"
 
-// async function getUser() {
-//     const token = (await cookies()).get("token")?.value
-//     if (!token) return null
-//     try {
-//         return jwt.verify(token, process.env.JWT_SECRET!)
-//     } catch {
-//         return null
-//     }
-// }
-
-// export default async function CartPage() {
-//     const user: any = await getUser()
-//     if (!user) redirect("/login")
-
-//     const cartItems = await prisma.cart.findMany({
-//         where: { userId: user.id },
-//         include: { magazine: true },
-//     })
-
-//     return (
-//         <div className="min-h-screen bg-zinc-900/50 border border-zinc-800 p-10">
-//             <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
-
-//             {cartItems.length === 0 ? (
-//                 <p>No items in cart</p>
-//             ) : (
-//                 <div className="space-y-4">
-//                     {cartItems.map((item: any) => (
-//                         <div
-//                             key={item.id}
-//                             className="bg-gray-900 p-4 rounded-xl shadow flex justify-between"
-//                         >
-//                             <div>
-//                                 <h2 className="font-semibold">
-//                                     {item.magazine.title}
-//                                 </h2>
-//                                 <p>₹{item.magazine.price}</p>
-//                             </div>
-//                             <form action={removeFromCart.bind(null, item.id)}>
-//                                 <button type="submit" className="text-red-500 hover:text-red-700 text-sm">
-//                                     Remove
-//                                 </button>
-//                             </form>
-//                         </div>
-//                     ))}
-//                 </div>
-//             )}
-//         </div>
-//     )
-// }
 
 
 
@@ -66,7 +11,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { removeFromCart } from "@/app/actions/cart.actions"
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Box } from "lucide-react"
-
+import Image from "next/image"
 async function getUser() {
     const token = (await cookies()).get("token")?.value
     if (!token) return null
@@ -128,13 +73,15 @@ export default async function CartPage() {
                                     className="group relative bg-zinc-900/40 border border-white/5 rounded-2xl p-4 md:p-6 flex gap-6 items-center transition-all hover:bg-zinc-900/60 hover:border-white/10"
                                 >
                                     {/* Magazine Cover Preview */}
-                                    <div className="w-20 h-28 md:w-24 md:h-32 bg-zinc-800 rounded-lg overflow-hidden shrink-0 shadow-xl">
-                                        <img
-                                            src={item.magazine.coverImage}
-                                            alt={item.magazine.title}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
+                                   <div className="relative w-20 h-28 md:w-24 md:h-32 bg-zinc-800 rounded-lg overflow-hidden shrink-0 shadow-xl">
+    <Image
+        src={item.magazine.coverImage}
+        alt={item.magazine.title}
+        fill
+        sizes="(max-width: 768px) 80px, 96px"
+        className="object-cover"
+    />
+</div>
 
                                     {/* Item Details */}
                                     <div className="flex-1 min-w-0">

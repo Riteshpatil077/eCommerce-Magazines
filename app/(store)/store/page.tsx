@@ -6,44 +6,40 @@ import { BookOpen, ShoppingCart, LogOut, Flame, Sparkles } from "lucide-react"
 import StoreSearch from "@/app/components/user/StoreSearchProps"
 import { getUserFromToken } from "@/app/lib/auth"
 import { addToCart } from "@/app/actions/cart.actions"
+import { unstable_cache } from "next/cache"
+import Image from "next/image" // Use Next.js Image!
+import LogoutButton from "@/app/components/logout-btn"
+// Cache the magazine fetch for 1 hour
+const getMagazines = unstable_cache(
+  async () => {
+    return prisma.magazine.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" },
+    })
+  },
+  ["magazines-list"],
+  { revalidate: 3600 }
+)
 
 export default async function StorePage() {
-  const user: any = await getUserFromToken()
+  // Start fetching magazines and user auth in parallel
+  const magazinesPromise = getMagazines()
+  const userPromise = getUserFromToken()
 
-  // 1. Fetch Magazines
-  const magazines = await prisma.magazine.findMany({
-    where: { isActive: true },
-    orderBy: { createdAt: "desc" },
-  })
+  const [magazines, user] = await Promise.all([magazinesPromise, userPromise])
 
-  // 2. Fetch User Specific Data (Subscriptions & Cart Count)
   let subscribedIds = new Set<string>()
   let cartItemsCount = 0
 
-  // if (user) {
-  //   const [subscriptions, cartCount] = await Promise.all([
-  //     prisma.subscription.findMany({
-  //       where: { userId: user.id, isActive: true },
-  //       select: { magazineId: true }
-  //     }),
-
-  //test 
+  // Only fetch user-specific DB data if user is logged in
   if (user) {
     const [subscriptions, cartCount] = await Promise.all([
       prisma.subscription.findMany({
-        where: {
-          userId: user.id,
-          isActive: true,
-          paymentStatus: "APPROVED" // ADD THIS: Only show 'Owned' if paid
-        },
+        where: { userId: user.id, isActive: true, paymentStatus: "APPROVED" },
         select: { magazineId: true }
       }),
-      // Using .count() is more efficient than fetching all items
-      prisma.cart.count({
-        where: { userId: user.id }
-      })
+      prisma.cart.count({ where: { userId: user.id } })
     ])
-
     subscribedIds = new Set(subscriptions.map(s => s.magazineId))
     cartItemsCount = cartCount
   }
@@ -98,9 +94,7 @@ export default async function StorePage() {
                   <span className="text-xs font-medium text-white/60 hidden md:block">Account</span>
                 </Link>
 
-                <Link href="/api/auth/logout" className="p-2 text-white/20 hover:text-red-400 transition-colors">
-                  <LogOut className="w-4 h-4" />
-                </Link>
+                <LogoutButton />
               </>
             ) : (
               <div className="flex items-center gap-3">
@@ -118,11 +112,14 @@ export default async function StorePage() {
         {/* ── Hero ── */}
         {featured && (
           <section className="relative h-[80vh] w-full overflow-hidden">
-            <img
-              src={featured.coverImage}
-              alt={featured.title}
-              className="w-full h-full object-cover object-[center_30%]"
-            />
+          <Image
+  src={featured.coverImage}
+  alt={featured.title}
+  fill
+  priority // Tells Next.js to load this immediately (LCP optimization)
+  sizes="100vw" // Helps the browser allocate memory for a full-width image
+  className="object-cover object-[center_30%]"
+/>
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
             <div className="absolute bottom-24 left-6 md:left-16 max-w-3xl">
               <h1 className="font-serif text-5xl md:text-7xl font-normal leading-none tracking-tighter mb-8 text-white">
@@ -162,7 +159,13 @@ function Section({ title, magazines, subscribedIds }: { title: string; magazines
 
           return (
             <div key={mag.id} className="snap-start relative min-w-[180px] md:min-w-[240px] aspect-[3/4] rounded-2xl overflow-hidden group bg-zinc-900 border border-white/5 transition-all hover:border-amber-400/30">
-              <img src={mag.coverImage} alt={mag.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+             <Image 
+    src={mag.coverImage} 
+    alt={mag.title}
+    fill // Replaces w-full h-full
+    sizes="(max-width: 768px) 180px, 240px" // Prevents downloading oversized images
+    className="object-cover group-hover:scale-110 transition-transform duration-700" 
+  />
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-80" />
 
               {/* Owned Badge */}
@@ -182,21 +185,38 @@ function Section({ title, magazines, subscribedIds }: { title: string; magazines
                 </p>
 
                 {/* Button Logic */}
+            {/* Button Group */}
                 <div className="grid grid-cols-1 gap-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                   {isSubscribed ? (
                     <Link
                       href={`/dashboard/read/${mag.slug}`}
-                      className="w-full py-2.5 bg-amber-400 text-zinc-950 text-[10px] font-black uppercase text-center rounded-lg hover:bg-stone-200 transition-colors shadow-lg block"
+                      className="w-full py-2.5 bg-white text-zinc-950 text-[10px] font-black uppercase text-center rounded-lg hover:bg-stone-200 transition-colors shadow-lg block"
                     >
                       Read Magazine
                     </Link>
                   ) : (
-                    <Link
-                      href={`/store/${mag.slug}`}
-                      className="w-full py-2.5 bg-amber-400 text-zinc-950 text-[10px] font-black uppercase text-center rounded-lg hover:bg-amber-300 transition-colors shadow-lg shadow-amber-400/10 block"
-                    >
-                      Subscribe Now
-                    </Link>
+                    <>
+                      {/* ADD TO CART BUTTON */}
+                     {/* Replace your current form with this */}
+<form action={addToCart}>
+  <input type="hidden" name="magazineId" value={mag.id} />
+  <button
+    type="submit"
+    className="w-full py-2.5 bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white text-[10px] font-black uppercase text-center rounded-lg hover:bg-zinc-700 transition-colors shadow-lg flex items-center justify-center gap-2"
+  >
+    <ShoppingCart className="w-3 h-3" />
+    Add to Cart
+  </button>
+</form>
+
+                      {/* SUBSCRIBE BUTTON */}
+                      <Link
+                        href={`/store/${mag.slug}`}
+                        className="w-full py-2.5 bg-amber-400 text-zinc-950 text-[10px] font-black uppercase text-center rounded-lg hover:bg-amber-300 transition-colors shadow-lg block"
+                      >
+                        Subscribe Now
+                      </Link>
+                    </>
                   )}
                 </div>
               </div>

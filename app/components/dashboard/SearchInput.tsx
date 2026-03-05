@@ -10,18 +10,27 @@ export default function SearchInput() {
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   
+  // 1. Critical for Hydration: Only show the "real" value once mounted
+  const [mounted, setMounted] = useState(false)
   const [value, setValue] = useState(searchParams.get("q") || "")
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams)
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    // Skip the first update to avoid redundant routing on mount
+    if (!mounted) return;
+
+    const params = new URLSearchParams(searchParams.toString())
     
     if (value) {
       params.set("q", value)
+      params.set("page", "1") // Reset to page 1 on new search
     } else {
       params.delete("q")
     }
 
-    // Wait 300ms after user stops typing to update results
     const timeout = setTimeout(() => {
       startTransition(() => {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false })
@@ -29,7 +38,9 @@ export default function SearchInput() {
     }, 300)
 
     return () => clearTimeout(timeout)
-  }, [value, pathname, router, searchParams])
+    // We only want to trigger this when 'value' changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, pathname, router])
 
   return (
     <div className="relative group max-w-md mb-8">
@@ -43,6 +54,8 @@ export default function SearchInput() {
       
       <input
         type="text"
+        // 2. Suppress the warning caused by browser extensions/form filler
+        suppressHydrationWarning
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Search by publication title..."
@@ -51,6 +64,7 @@ export default function SearchInput() {
 
       {value && !isPending && (
         <button 
+          type="button"
           onClick={() => setValue("")}
           className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
         >
