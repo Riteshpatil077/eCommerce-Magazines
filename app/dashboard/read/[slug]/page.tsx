@@ -30,7 +30,7 @@ export default async function ReadMagazinePage(props: { params: Promise<{ slug: 
         },
     });
 
-    if (!subscription) redirect(`/store/${slug}`);
+    if (!subscription) return redirect(`/store/${slug}`);
 
     // Fallback name for the UI
     const displayName = dbUser.name || dbUser.email.split('@')[0] || "Reader";

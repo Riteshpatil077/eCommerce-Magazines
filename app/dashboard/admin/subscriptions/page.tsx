@@ -22,10 +22,23 @@ export default function AdminSubscriptionsPage() {
 
   async function fetchSubs() {
     setLoading(true)
-    const res = await fetch("/api/admin/subscriptions")
-    const data = await res.json()
-    setSubs(data)
-    setLoading(false)
+    try {
+      const res = await fetch("/api/admin/subscriptions")
+      const data = await res.json()
+
+      // CHECK: Is data actually an array?
+      if (Array.isArray(data)) {
+        setSubs(data)
+      } else {
+        console.error("API Error: Expected array but got:", data)
+        setSubs([]) // Fallback to empty array to prevent crash
+      }
+    } catch (error) {
+      console.error("Fetch failed:", error)
+      setSubs([]) // Fallback to empty array on network error
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { fetchSubs() }, [])

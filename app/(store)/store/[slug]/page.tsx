@@ -34,6 +34,7 @@ export default async function MagazinePage({ params }: PageProps) {
       userId: user.id,
       magazineId: magazine.id,
       paymentStatus: "APPROVED",
+      isActive: true,
     },
   })
 

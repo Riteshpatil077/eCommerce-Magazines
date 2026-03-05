@@ -119,6 +119,7 @@ export default function StoreSearch({ magazines, subscribedIds }: StoreSearchPro
                     onChange={handleChange}
                     onFocus={handleFocus}
                     placeholder="Search magazines by title, category..."
+                    suppressHydrationWarning
                     className="flex-1 bg-transparent text-sm text-stone-100 placeholder:text-white/25 focus:outline-none"
                 />
 

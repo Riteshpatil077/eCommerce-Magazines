@@ -23,15 +23,16 @@ export async function subscribeAction(formData: FormData) {
       },
     },
     update: {
-      isActive: true,
-      paymentStatus: "APPROVED", // Or keep as PENDING depending on your flow
+      // If they click subscribe again, keep it pending
+      isActive: false,
+      paymentStatus: "PENDING", // Or keep as PENDING depending on your flow
       updatedAt: new Date(),
     },
     create: {
       userId: user.id,
       magazineId: magazineId,
-      isActive: true,
-      paymentStatus: "APPROVED",
+      isActive: false,// User cannot read yet
+      paymentStatus: "PENDING",// Admin must approve this in your Admin Panel
     },
   })
   // Redirect back to the reader or a success page
