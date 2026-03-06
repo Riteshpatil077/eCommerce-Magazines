@@ -479,8 +479,6 @@ import LogoutButton from "@/app/components/logout-btn"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import MagazineSlider from "@/app/components/user/MagazineSlider"
-import { cookies } from "next/headers"
-import jwt from "jsonwebtoken" // Added missing import
 
 
 // Cache the magazine fetch for 1 hour

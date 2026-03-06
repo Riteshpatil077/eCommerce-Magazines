@@ -16,7 +16,7 @@ export default function SuccessPage() {
                 </div>
 
                 <div className="flex flex-col gap-3 pt-4">
-                    <Link href="/dashboard/user/subscriptions" className="bg-amber-400 text-zinc-950 font-black py-4 rounded-2xl hover:bg-amber-300 transition-all flex items-center justify-center gap-2 group">
+                    <Link href="/dashboard/user" className="bg-amber-400 text-zinc-950 font-black py-4 rounded-2xl hover:bg-amber-300 transition-all flex items-center justify-center gap-2 group">
                         VIEW MY SUBSCRIPTIONS
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </Link>
