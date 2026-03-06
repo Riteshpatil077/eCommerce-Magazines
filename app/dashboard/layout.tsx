@@ -115,7 +115,7 @@ export default async function DashboardLayout({
           {/* User Profile Section (Right Side) */}
           <div className="flex items-center gap-4">
             <div className="group relative">
-              <button className="flex items-center gap-3 p-1.5 rounded-full hover:bg-white/5 transition-all border border-transparent hover:border-white/10">
+              <button suppressHydrationWarning className="flex items-center gap-3 p-1.5 rounded-full hover:bg-white/5 transition-all border border-transparent hover:border-white/10">
                 <div className="flex flex-col items-end hidden sm:block">
                   <p className="text-xs font-medium text-stone-200 leading-none">{decoded.email?.split('@')[0]}</p>
                   <p className="text-[10px] text-white/30 mt-1 capitalize">{decoded.role?.toLowerCase()}</p>

@@ -1,7 +1,7 @@
 
 import Link from "next/link"
 import { BookOpen, ArrowRight, Sparkles, Globe, Zap, CheckCircle, ShieldCheck, Star } from "lucide-react"
-
+import Image from "next/image"
 const featuredMagazines = [
   { title: "Vogue India", category: "Fashion", color: "from-rose-500/20 to-zinc-950", accent: "text-rose-400 border-rose-400/20", image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&q=80" },
   { title: "Nat Geo", category: "Science", color: "from-amber-500/20 to-zinc-950", accent: "text-amber-400 border-amber-400/20", image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&q=80" },
@@ -75,7 +75,15 @@ export default function LandingPage() {
               key={mag.title}
               className="group relative aspect-[3/4.5] rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 transition-all duration-700 hover:-translate-y-4 hover:border-amber-400/30 shadow-2xl"
             >
-              <img src={mag.image} alt={mag.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
+              {/* 2. PERFORMANCE FIX: Used next/image with priority and sizes */}
+              <Image
+                src={mag.image}
+                alt={mag.title}
+                fill
+                sizes="(max-width: 768px) 50vw, 20vw"
+                className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                priority={i < 3} // Preloads the first 3 images to fix LCP
+              />
               <div className={`absolute inset-0 bg-gradient-to-t ${mag.color}`} />
               <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-start">
                 <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-1 rounded-md border ${mag.accent} mb-3`}>
@@ -178,3 +186,83 @@ export default function LandingPage() {
     </div>
   )
 }
+
+
+
+// import Link from "next/link"
+// import { BookOpen, ArrowRight, Sparkles, Globe, Zap, CheckCircle, ShieldCheck, Star } from "lucide-react"
+// import Image from "next/image"
+
+// const featuredMagazines = [
+//   { title: "Vogue India", category: "Fashion", color: "from-rose-500/20 to-zinc-950", accent: "text-rose-400 border-rose-400/20", image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&q=80" },
+//   { title: "Nat Geo", category: "Science", color: "from-amber-500/20 to-zinc-950", accent: "text-amber-400 border-amber-400/20", image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800&q=80" },
+//   { title: "Wired", category: "Technology", color: "from-cyan-500/20 to-zinc-950", accent: "text-cyan-400 border-cyan-400/20", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80" },
+//   { title: "AD", category: "Design", color: "from-stone-500/20 to-zinc-950", accent: "text-stone-300 border-stone-300/20", image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80" },
+//   { title: "Time", category: "News", color: "from-red-500/20 to-zinc-950", accent: "text-red-400 border-red-400/20", image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80" },
+// ]
+
+// export default function LandingPage() {
+//   return (
+//     <div className="min-h-screen bg-zinc-950 text-stone-100 selection:bg-amber-400 selection:text-zinc-900 font-sans">
+
+//       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-6 bg-zinc-950/70 backdrop-blur-xl border-b border-white/5">
+//         <Link href="/" className="flex items-center gap-3 group">
+//           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20 transition-transform group-hover:scale-110">
+//             <BookOpen className="w-4 h-4 text-zinc-950" strokeWidth={2.5} />
+//           </div>
+//           <span className="text-xl font-bold tracking-tight italic">Pressly</span>
+//         </Link>
+//         {/* ... Nav Links ... */}
+//       </nav>
+
+//       <main> {/* Added <main> for Accessibility */}
+//         <section className="relative pt-44 pb-32 flex flex-col items-center text-center px-6 overflow-hidden">
+//           {/* 1. Performance: Used CSS opacity instead of heavy blur filters where possible */}
+//           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent opacity-50 pointer-events-none" />
+
+//           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-10">
+//             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+//             <span className="text-[9px] uppercase tracking-[3px] font-bold text-white/60">India's most curated library</span>
+//           </div>
+
+//           <h1 className="text-6xl md:text-8xl lg:text-9xl font-extralight leading-[0.95] tracking-tighter max-w-5xl">
+//             The Art of <br />
+//             <span className="italic font-normal text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500">Reading.</span>
+//           </h1>
+
+//           <p className="mt-10 text-lg md:text-xl text-white/40 max-w-2xl font-light leading-relaxed">
+//             Elevate your daily intake with a bespoke collection of the world&apos;s most influential publications.
+//           </p>
+
+//           {/* Magazine Showcase */}
+//           <div className="mt-32 w-full max-w-7xl px-4 grid grid-cols-2 md:grid-cols-5 gap-6">
+//             {featuredMagazines.map((mag, i) => (
+//               <div
+//                 key={mag.title}
+//                 className="group relative aspect-[3/4.5] rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 transition-all duration-700 hover:-translate-y-4 hover:border-amber-400/30 shadow-2xl"
+//               >
+//                 {/* 2. PERFORMANCE FIX: Used next/image with priority and sizes */}
+//                 <Image
+//                   src={mag.image}
+//                   alt={mag.title}
+//                   fill
+//                   sizes="(max-width: 768px) 50vw, 20vw"
+//                   className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+//                   priority={i < 3} // Preloads the first 3 images to fix LCP
+//                 />
+//                 <div className={`absolute inset-0 bg-gradient-to-t ${mag.color} pointer-events-none`} />
+//                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-start pointer-events-none">
+//                   <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-1 rounded-md border ${mag.accent} mb-3`}>
+//                     {mag.category}
+//                   </span>
+//                   <h2 className="text-xl font-medium italic">{mag.title}</h2> {/* Changed h3 to h2 for SEO order */}
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </section>
+//       </main>
+//       {/* ... rest of sections ... */}
+//     </div>
+//   )
+// }

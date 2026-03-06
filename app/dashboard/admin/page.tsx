@@ -85,7 +85,7 @@ export default async function AdminDashboard() {
           </div>
 
           <div className="flex gap-3">
-            <Link href="/admin/magazines/new" className="flex items-center gap-2 px-4 py-2 bg-amber-400 text-zinc-950 rounded-xl text-sm font-bold hover:bg-amber-300 transition-colors">
+            <Link href="/dashboard/admin/magazines/add" className="flex items-center gap-2 px-4 py-2 bg-amber-400 text-zinc-950 rounded-xl text-sm font-bold hover:bg-amber-300 transition-colors">
               <Plus className="w-4 h-4" />
               New Magazine
             </Link>

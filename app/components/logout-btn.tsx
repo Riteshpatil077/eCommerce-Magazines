@@ -7,6 +7,7 @@ export default function LogoutButton() {
   return (
     <form action={logoutAction} className="w-full">
       <button
+        suppressHydrationWarning
         type="submit"
         className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-white/30 hover:text-red-400 hover:bg-red-400/5 transition-all duration-150 group"
       >

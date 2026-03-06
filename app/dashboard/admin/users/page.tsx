@@ -1,6 +1,8 @@
 import UserSearch from "@/app/components/dashboard/UserSearch"
 import { prisma } from "@/app/lib/prisma"
 import { Users, ShieldCheck, UserIcon } from "lucide-react"
+import DeleteUserButton from "@/app/components/dashboard/DeleteUserButton"
+
 
 export default async function UsersPage({
   searchParams,
@@ -24,7 +26,7 @@ export default async function UsersPage({
   const members = users.length - admins
 
   return (
-   <div className="min-h-screen bg-zinc-950 text-stone-100 p-8 md:p-12">
+    <div className="min-h-screen bg-zinc-950 text-stone-100 p-8 md:p-12">
       {/* Header unchanged ... */}
       <div className="mb-10">
         <p className="flex items-center gap-2 text-[11px] tracking-[3px] uppercase text-amber-400 mb-3 font-medium">
@@ -49,15 +51,15 @@ export default async function UsersPage({
 
       {/* Table Section */}
       <div className="bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden">
-        {/* Column headers ... */}
+        {/* Adjusted Grid: col-span-3 for Email/Role to fit Actions */}
         <div className="grid grid-cols-12 px-6 py-3 border-b border-white/5 bg-zinc-800/40 text-[10px] tracking-[2px] uppercase text-white/25 font-medium">
-           <span className="col-span-1">#</span>
-           <span className="col-span-4">User</span>
-           <span className="col-span-4">Email</span>
-           <span className="col-span-3">Role</span>
+          <span className="col-span-1">#</span>
+          <span className="col-span-4">User</span>
+          <span className="col-span-3">Email</span>
+          <span className="col-span-3">Role</span>
+          <span className="col-span-1 text-right">Action</span>
         </div>
 
-        {/* Rows */}
         {users.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-white/20">
             <Users className="w-10 h-10 mb-3 opacity-30" strokeWidth={1} />
@@ -67,7 +69,6 @@ export default async function UsersPage({
           <div className="divide-y divide-white/5">
             {users.map((user, index) => {
               const isAdmin = user.role === "ADMIN"
-              // ... initials logic ...
               const initials = user.name
                 ? user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
                 : user.email?.[0]?.toUpperCase() ?? "?"
@@ -75,7 +76,7 @@ export default async function UsersPage({
               return (
                 <div key={user.id} className="grid grid-cols-12 items-center px-6 py-3.5 hover:bg-white/[0.02] transition-colors group">
                   <span className="col-span-1 text-xs text-white/20 font-mono">{String(index + 1).padStart(2, "0")}</span>
-                  
+
                   <div className="col-span-4 flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${isAdmin ? "bg-gradient-to-br from-violet-500 to-purple-600 text-white" : "bg-gradient-to-br from-amber-400 to-orange-500 text-zinc-950"}`}>
                       {initials}
@@ -83,7 +84,7 @@ export default async function UsersPage({
                     <span className="text-sm font-medium text-stone-200 truncate">{user.name || "No name"}</span>
                   </div>
 
-                  <div className="col-span-4">
+                  <div className="col-span-3">
                     <span className="text-sm text-white/40 font-light truncate block">{user.email}</span>
                   </div>
 
@@ -92,6 +93,11 @@ export default async function UsersPage({
                       {isAdmin ? <ShieldCheck className="w-3 h-3" /> : <UserIcon className="w-3 h-3" />}
                       {user.role}
                     </span>
+                  </div>
+
+                  {/* New Delete Action Column */}
+                  <div className="col-span-1 flex justify-end">
+                    <DeleteUserButton userId={user.id} />
                   </div>
                 </div>
               )
