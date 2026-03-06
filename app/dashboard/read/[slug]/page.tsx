@@ -4,7 +4,7 @@ import { getUserFromToken } from "@/app/lib/auth";
 import ClientViewerBridge from "@/app/components/ClientViewerBridge";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-export default async function ReadMagazinePage(props: { 
+export default async function ReadMagazinePage(props: {
     params: Promise<{ slug: string }>,
     searchParams: Promise<{ [key: string]: string | string[] | undefined }> // Add this
 }) {
@@ -35,9 +35,9 @@ export default async function ReadMagazinePage(props: {
     const displayName = dbUser.name || dbUser.email.split('@')[0] || "Reader";
 
     return (
-/* Use h-screen and flex-col to lock the header at the top */
+        /* Use h-screen and flex-col to lock the header at the top */
         <div className="flex flex-col h-screen bg-zinc-950 overflow-hidden text-white">
-            
+
             {/* HIDE HEADER IF IN FULLSCREEN MODE */}
             {!isFullscreen && (
                 <header className="h-16 flex-none flex items-center justify-between px-8 border-b border-white/5 bg-zinc-900/50 backdrop-blur-md z-20">
@@ -56,7 +56,7 @@ export default async function ReadMagazinePage(props: {
             )}
 
             <main className="flex-1 relative w-full overflow-hidden bg-[#0a0a0a]">
-                <ClientViewerBridge pdfUrl={magazine.pdfUrl} />
+                <ClientViewerBridge pdfUrl={magazine.pdfUrl} slug={slug} fullscreen={isFullscreen} />
             </main>
         </div>
     );

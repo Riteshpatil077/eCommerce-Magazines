@@ -1,3 +1,5 @@
+
+
 import { prisma } from "@/app/lib/prisma"
 import Link from "next/link"
 import { BookOpen, ShoppingCart, LogOut, Flame, Sparkles } from "lucide-react"
@@ -6,9 +8,6 @@ import { addToCart } from "@/app/actions/cart.actions"
 import { unstable_cache } from "next/cache"
 import Image from "next/image"
 import LogoutButton from "@/app/components/logout-btn"
-import { cookies } from "next/headers"
-import jwt from "jsonwebtoken" // Added missing import
-
 // Cache the magazine fetch for 1 hour
 const getMagazines = unstable_cache(
   async () => {
@@ -157,12 +156,11 @@ export default async function StorePage() {
     </div>
   )
 }
-
 function Section({ title, magazines, subscribedIds }: { title: string; magazines: any[]; subscribedIds: Set<string> }) {
   if (magazines.length === 0) return null;
 
   return (
-    <div className="px-6 md:px-12">
+    <div id={id} className="px-6 md:px-12 scroll-mt-24">
       <h2 className="font-serif text-2xl md:text-3xl font-medium text-stone-100 mb-8">{title}</h2>
       <div className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide snap-x">
         {magazines.map((mag: any) => {
@@ -196,7 +194,7 @@ function Section({ title, magazines, subscribedIds }: { title: string; magazines
                   {isSubscribed ? (
                     <Link
                       href={`/dashboard/read/${mag.slug}`}
-                      className="w-full py-2.5 bg-white text-zinc-950 text-[10px] font-black uppercase text-center rounded-lg hover:bg-stone-200 transition-colors shadow-lg block"
+                      className="w-full py-2.5 bg-amber-400 text-zinc-950 text-[10px] font-black uppercase text-center rounded-lg hover:bg-stone-200 transition-colors shadow-lg block"
                     >
                       Read Magazine
                     </Link>

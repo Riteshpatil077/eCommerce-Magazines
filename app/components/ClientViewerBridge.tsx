@@ -15,8 +15,9 @@ const MagazineViewer = dynamic(() => import("./magazineViewer"), {
     ),
 });
 
-export default function ClientViewerBridge({ pdfUrl }: { pdfUrl: string }) {
+export default function ClientViewerBridge({ pdfUrl, slug,
+    fullscreen, }: { pdfUrl: string; slug: string; fullscreen?: boolean; }) {
     return <div className="h-full w-full">
-            <MagazineViewer pdfUrl={pdfUrl} />
-        </div>
+        <MagazineViewer pdfUrl={pdfUrl} slug={slug} fullscreen={fullscreen} />
+    </div>
 }

@@ -3,7 +3,7 @@ import { prisma } from "@/app/lib/prisma"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 
-// Standard Auth Helper to keep code clean
+// Standard Auth Helper
 async function checkAdmin() {
   const cookieStore = await cookies()
   const token = cookieStore.get("token")?.value
@@ -29,15 +29,23 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     const body = await req.json()
 
+    // Build the data object dynamically
+    const updateData: any = {
+      updatedAt: new Date(),
+    }
+
+    // Only update fields if they are explicitly provided in the request body
+    if (body.paymentStatus !== undefined) updateData.paymentStatus = body.paymentStatus;
+    if (body.isActive !== undefined) updateData.isActive = body.isActive;
+
+    // Handle Date conversion safely
+    if (body.expiryDate !== undefined) {
+      updateData.expiryDate = body.expiryDate ? new Date(body.expiryDate) : null;
+    }
+
     const updated = await prisma.subscription.update({
       where: { id: id },
-      data: {
-        paymentStatus: body.paymentStatus,
-        isActive: body.isActive,
-        // If expiryDate is passed, convert to Date object, otherwise ignore
-        ...(body.expiryDate && { expiryDate: new Date(body.expiryDate) }),
-        updatedAt: new Date(),
-      },
+      data: updateData,
     })
 
     return NextResponse.json(updated)
