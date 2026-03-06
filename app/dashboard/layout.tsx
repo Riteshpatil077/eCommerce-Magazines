@@ -35,7 +35,7 @@ export default async function DashboardLayout({
   const userNav = [
     { href: "/dashboard/user", label: "My Library", icon: BookOpen },
     { href: "/store", label: "Browse Store", icon: LayoutDashboard },
-    { href: "/dashboard/user/billing", label: "Billing", icon: CreditCard },
+    { href: "/store/checkout", label: "Billing", icon: CreditCard },
     { href: "/dashboard/user/cart", label: "Cart", icon: CreditCard },
   ]
 

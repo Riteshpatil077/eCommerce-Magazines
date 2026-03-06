@@ -112,14 +112,14 @@ export default async function StorePage() {
         {/* ── Hero ── */}
         {featured && (
           <section className="relative h-[80vh] w-full overflow-hidden">
-          <Image
-  src={featured.coverImage}
-  alt={featured.title}
-  fill
-  priority // Tells Next.js to load this immediately (LCP optimization)
-  sizes="100vw" // Helps the browser allocate memory for a full-width image
-  className="object-cover object-[center_30%]"
-/>
+            <Image
+              src={featured.coverImage}
+              alt={featured.title}
+              fill
+              priority // Tells Next.js to load this immediately (LCP optimization)
+              sizes="100vw" // Helps the browser allocate memory for a full-width image
+              className="object-cover object-[center_30%]"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
             <div className="absolute bottom-24 left-6 md:left-16 max-w-3xl">
               <h1 className="font-serif text-5xl md:text-7xl font-normal leading-none tracking-tighter mb-8 text-white">
@@ -158,14 +158,14 @@ function Section({ title, magazines, subscribedIds }: { title: string; magazines
           const isSubscribed = subscribedIds.has(mag.id);
 
           return (
-            <div key={mag.id} className="snap-start relative min-w-[180px] md:min-w-[240px] aspect-[3/4] rounded-2xl overflow-hidden group bg-zinc-900 border border-white/5 transition-all hover:border-amber-400/30">
-             <Image 
-    src={mag.coverImage} 
-    alt={mag.title}
-    fill // Replaces w-full h-full
-    sizes="(max-width: 768px) 180px, 240px" // Prevents downloading oversized images
-    className="object-cover group-hover:scale-110 transition-transform duration-700" 
-  />
+            <div key={`${title}-${mag.id}`} className="snap-start relative min-w-[180px] md:min-w-[240px] aspect-[3/4] rounded-2xl overflow-hidden group bg-zinc-900 border border-white/5 transition-all hover:border-amber-400/30">
+              <Image
+                src={mag.coverImage}
+                alt={mag.title}
+                fill // Replaces w-full h-full
+                sizes="(max-width: 768px) 180px, 240px" // Prevents downloading oversized images
+                className="object-cover group-hover:scale-110 transition-transform duration-700"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-80" />
 
               {/* Owned Badge */}
@@ -185,7 +185,7 @@ function Section({ title, magazines, subscribedIds }: { title: string; magazines
                 </p>
 
                 {/* Button Logic */}
-            {/* Button Group */}
+                {/* Button Group */}
                 <div className="grid grid-cols-1 gap-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                   {isSubscribed ? (
                     <Link
@@ -197,17 +197,18 @@ function Section({ title, magazines, subscribedIds }: { title: string; magazines
                   ) : (
                     <>
                       {/* ADD TO CART BUTTON */}
-                     {/* Replace your current form with this */}
-<form action={addToCart}>
-  <input type="hidden" name="magazineId" value={mag.id} />
-  <button
-    type="submit"
-    className="w-full py-2.5 bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white text-[10px] font-black uppercase text-center rounded-lg hover:bg-zinc-700 transition-colors shadow-lg flex items-center justify-center gap-2"
-  >
-    <ShoppingCart className="w-3 h-3" />
-    Add to Cart
-  </button>
-</form>
+                      {/* Replace your current form with this */}
+                      <form action={addToCart}>
+                        <input type="hidden" name="magazineId" value={mag.id} />
+                        <button
+                          type="submit"
+                          suppressHydrationWarning // <--- Add this property here
+                          className="w-full py-2.5 bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white text-[10px] font-black uppercase text-center rounded-lg hover:bg-zinc-700 transition-colors shadow-lg flex items-center justify-center gap-2"
+                        >
+                          <ShoppingCart className="w-3 h-3" />
+                          Add to Cart
+                        </button>
+                      </form>
 
                       {/* SUBSCRIBE BUTTON */}
                       <Link

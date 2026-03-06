@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 import { prisma } from "@/app/lib/prisma"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
@@ -15,7 +7,9 @@ import Link from "next/link"
 import { removeFromCart } from "@/app/actions/cart.actions"
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Box } from "lucide-react"
 
+
 import Image from "next/image"
+
 
 
 async function getUser() {
@@ -79,15 +73,15 @@ export default async function CartPage() {
                                     className="group relative bg-zinc-900/40 border border-white/5 rounded-2xl p-4 md:p-6 flex gap-6 items-center transition-all hover:bg-zinc-900/60 hover:border-white/10"
                                 >
                                     {/* Magazine Cover Preview */}
-                                   <div className="relative w-20 h-28 md:w-24 md:h-32 bg-zinc-800 rounded-lg overflow-hidden shrink-0 shadow-xl">
-    <Image
-        src={item.magazine.coverImage}
-        alt={item.magazine.title}
-        fill
-        sizes="(max-width: 768px) 80px, 96px"
-        className="object-cover"
-    />
-</div>
+                                    <div className="relative w-20 h-28 md:w-24 md:h-32 bg-zinc-800 rounded-lg overflow-hidden shrink-0 shadow-xl">
+                                        <Image
+                                            src={item.magazine.coverImage}
+                                            alt={item.magazine.title}
+                                            fill
+                                            sizes="(max-width: 768px) 80px, 96px"
+                                            className="object-cover"
+                                        />
+                                    </div>
 
                                     {/* Item Details */}
                                     <div className="flex-1 min-w-0">
