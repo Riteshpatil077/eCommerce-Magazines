@@ -6,6 +6,8 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { removeFromCart } from "@/app/actions/cart.actions"
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Box } from "lucide-react"
+
+
 import Image from "next/image"
 import { RemoveButton } from "@/app/components/cart/RemoveButton"
 
