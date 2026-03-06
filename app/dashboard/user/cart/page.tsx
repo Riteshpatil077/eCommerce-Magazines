@@ -1,11 +1,11 @@
-<<<<<<< HEAD
 
 
 
 
 
-=======
->>>>>>> 7ec27e84ab364b30e5e98ef167035dd1b9cb09dc
+
+
+
 
 import { prisma } from "@/app/lib/prisma"
 import { cookies } from "next/headers"
@@ -14,12 +14,10 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { removeFromCart } from "@/app/actions/cart.actions"
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Box } from "lucide-react"
-<<<<<<< HEAD
-import Image from "next/image"
-=======
-// import { processCheckout } from "@/app/actions/checkout.actions"
 
->>>>>>> 7ec27e84ab364b30e5e98ef167035dd1b9cb09dc
+import Image from "next/image"
+
+
 async function getUser() {
     const token = (await cookies()).get("token")?.value
     if (!token) return null
