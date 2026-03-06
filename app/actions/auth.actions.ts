@@ -11,7 +11,7 @@ function generateToken(user: any) {
   return jwt.sign(
     { id: user.id, role: user.role },
     process.env.JWT_SECRET!,
-    { expiresIn: "7d" }
+    { expiresIn: "1d" }
   )
 }
 
@@ -36,7 +36,7 @@ export async function registerAction(prevState: any, formData: FormData) {
 
   const token = generateToken(user)
 
-  // ✅ FIX: await cookies()
+
   const cookieStore = await cookies()
 
   cookieStore.set("token", token, {

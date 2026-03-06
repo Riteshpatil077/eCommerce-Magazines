@@ -1,5 +1,4 @@
 
-
 import { prisma } from "@/app/lib/prisma"
 import Link from "next/link"
 import { BookOpen, ShoppingCart, LogOut, Flame, Sparkles } from "lucide-react"
@@ -8,6 +7,11 @@ import { addToCart } from "@/app/actions/cart.actions"
 import { unstable_cache } from "next/cache"
 import Image from "next/image"
 import LogoutButton from "@/app/components/logout-btn"
+import MagazineSlider from "@/app/components/user/MagazineSlider"
+import { cookies } from "next/headers"
+import jwt from "jsonwebtoken" // Added missing import
+
+
 // Cache the magazine fetch for 1 hour
 const getMagazines = unstable_cache(
   async () => {
@@ -149,14 +153,30 @@ export default async function StorePage() {
         )}
 
         <div className="py-16 space-y-20">
-          <Section id="trending" title="Trending Now" magazines={magazines.slice(0, 8)} subscribedIds={subscribedIds} />
-          <Section id="new" title="New Arrivals" magazines={magazines.slice(8, 16)} subscribedIds={subscribedIds} />
+          <div className="py-16 space-y-20">
+  <MagazineSlider 
+    id="trending" 
+    title="Trending Now" 
+    magazines={magazines.slice(0, 8)} 
+    subscribedIds={subscribedIds} 
+  />
+  <MagazineSlider 
+    id="new" 
+    title="New Arrivals" 
+    magazines={magazines.slice(8, 16)} 
+    subscribedIds={subscribedIds} 
+  />
+</div>
         </div>
       </main>
     </div>
   )
 }
-function Section({ title, magazines, subscribedIds }: { title: string; magazines: any[]; subscribedIds: Set<string> }) {
+
+
+
+function Section({ id, title, magazines, subscribedIds }: { id: string; title: string; magazines: any[]; subscribedIds: Set<string> }) {
+
   if (magazines.length === 0) return null;
 
   return (
@@ -200,7 +220,7 @@ function Section({ title, magazines, subscribedIds }: { title: string; magazines
                     </Link>
                   ) : (
                     <>
-                      <form action={addToCart}>
+                      <form action ={addToCart}>
                         <input type="hidden" name="magazineId" value={mag.id} />
                         <button
                           type="submit"
