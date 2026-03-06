@@ -43,20 +43,23 @@ export async function addToCart(formData: FormData) {
             });
         }
 
-        // Mark that the DB operation was successful
-        shouldRedirect = true;
+        // Just revalidate the data so the UI updates
+        revalidatePath("/dashboard/user/cart");
+        revalidatePath("/store");
 
+        // Return a success message instead of redirecting
+        return { success: true };
     } catch (err) {
         console.error("Cart Error:", err);
         return { error: "Database error occurred" };
     }
 
-    // Perform revalidation and redirect OUTSIDE the try/catch
-    if (shouldRedirect) {
-        revalidatePath("/cart");
-        revalidatePath("/store");
-        redirect("/dashboard/user/cart");
-    }
+    // // Perform revalidation and redirect OUTSIDE the try/catch
+    // if (shouldRedirect) {
+    //     revalidatePath("/dashboard/user/cart");
+    //     revalidatePath("/store");
+    //     redirect("/dashboard/user/cart");
+    // }
 }
 
 export async function removeFromCart(cartId: string) {
@@ -71,5 +74,5 @@ export async function removeFromCart(cartId: string) {
         return { error: "Database error occurred" }
     }
 
-    revalidatePath("/cart")
+    revalidatePath("/dashboard/user/cart")
 }

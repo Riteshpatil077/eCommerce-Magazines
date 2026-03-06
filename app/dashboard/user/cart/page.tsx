@@ -7,6 +7,8 @@ import Link from "next/link"
 import { removeFromCart } from "@/app/actions/cart.actions"
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Box } from "lucide-react"
 import Image from "next/image"
+import { RemoveButton } from "@/app/components/cart/RemoveButton"
+
 async function getUser() {
     const token = (await cookies()).get("token")?.value
     if (!token) return null
@@ -104,13 +106,14 @@ export default async function CartPage() {
                                             <span className="text-xs text-white/30 font-medium">Monthly Subscription</span>
 
                                             <form action={removeFromCart.bind(null, item.id)}>
-                                                <button
+                                                {/* <button
                                                     type="submit"
                                                     className="flex items-center gap-2 text-white/20 hover:text-rose-400 transition-colors py-2 px-3 rounded-lg hover:bg-rose-400/5"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                     <span className="text-xs font-bold uppercase tracking-tighter">Remove</span>
-                                                </button>
+                                                </button> */}
+                                                <RemoveButton />
                                             </form>
                                         </div>
                                     </div>

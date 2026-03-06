@@ -16,8 +16,6 @@ export default function AdminSubscriptionsPage() {
   const [subs, setSubs] = useState<Subscription[]>([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
-
-  // Search and Filter States
   const [searchQuery, setSearchQuery] = useState("")
 
   async function fetchSubs() {
@@ -25,17 +23,14 @@ export default function AdminSubscriptionsPage() {
     try {
       const res = await fetch("/api/admin/subscriptions")
       const data = await res.json()
-
-      // CHECK: Is data actually an array?
       if (Array.isArray(data)) {
         setSubs(data)
       } else {
-        console.error("API Error: Expected array but got:", data)
-        setSubs([]) // Fallback to empty array to prevent crash
+        setSubs([])
       }
     } catch (error) {
       console.error("Fetch failed:", error)
-      setSubs([]) // Fallback to empty array on network error
+      setSubs([])
     } finally {
       setLoading(false)
     }
@@ -43,7 +38,6 @@ export default function AdminSubscriptionsPage() {
 
   useEffect(() => { fetchSubs() }, [])
 
-  // Optimized Search Logic (searches Email, Title, Status, and Access)
   const filteredSubs = useMemo(() => {
     return subs.filter((sub) => {
       const searchStr = searchQuery.toLowerCase();
@@ -59,18 +53,11 @@ export default function AdminSubscriptionsPage() {
     });
   }, [subs, searchQuery]);
 
-  // COLOR LOGIC FOR PAYMENT STATUS
   const getStatusStyles = (status: string) => {
     const s = status.toUpperCase();
-    if (s === "APPROVED" || s === "SUCCESS") {
-      return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-    }
-    if (s === "REJECTED" || s === "FAILED") {
-      return "bg-red-500/10 text-red-400 border border-red-500/20";
-    }
-    if (s === "PENDING") {
-      return "bg-orange-500/10 text-orange-400 border border-orange-500/20";
-    }
+    if (s === "APPROVED" || s === "SUCCESS") return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+    if (s === "REJECTED" || s === "FAILED") return "bg-red-500/10 text-red-400 border border-red-500/20";
+    if (s === "PENDING") return "bg-orange-500/10 text-orange-400 border border-orange-500/20";
     return "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20";
   };
 
@@ -88,17 +75,30 @@ export default function AdminSubscriptionsPage() {
     }
   }
 
+  // LOGIC 1: ADD 30 DAYS TO EXISTING OR START NEW 30 DAYS
   const handleApprove30Days = (sub: Subscription) => {
     const currentExpiry = sub.expiryDate ? new Date(sub.expiryDate).getTime() : Date.now();
     const baseTime = currentExpiry > Date.now() ? currentExpiry : Date.now();
     const newExpiry = new Date(baseTime + 30 * 24 * 60 * 60 * 1000);
 
     updateSubscription(sub.id, {
-      paymentStatus: "SUCCESS",
+      paymentStatus: "APPROVED",
       isActive: true,
       expiryDate: newExpiry
     });
-  }
+  };
+
+  // LOGIC 2: INITIAL GRANT (AUTO 1 MONTH)
+  const handleGrantInitialAccess = (sub: Subscription) => {
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + 1); // Auto-set to 1 month from today
+
+    updateSubscription(sub.id, {
+      isActive: true,
+      paymentStatus: "APPROVED",
+      expiryDate: expiry
+    });
+  };
 
   async function deleteSubscription(id: string) {
     if (!confirm("Are you sure? This user will lose access immediately.")) return
@@ -123,38 +123,33 @@ export default function AdminSubscriptionsPage() {
     <div className="min-h-screen bg-zinc-950 text-stone-100 p-8">
       <div className="max-w-7xl mx-auto">
 
-        {/* Header Section */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <div>
             <h1 className="text-3xl font-serif">
               Subscription <span className="text-amber-400 italic">Management</span>
             </h1>
-            <p className="text-white/40 text-sm mt-2">Filter by email, status, or magazine</p>
+            <p className="text-white/40 text-sm mt-2">Grant access and manage expiry dates</p>
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
-            {/* Search Bar */}
             <div className="relative flex-1 md:w-80">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
               <input
                 type="text"
-                placeholder="Search email, paid, pending..."
+                placeholder="Search email, status..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-amber-400/50 transition-colors"
               />
             </div>
-
-            <button
-              onClick={fetchSubs}
-              className="p-2.5 bg-white/5 border border-white/10 rounded-xl text-white/40 hover:text-white transition-colors"
-            >
+            <button onClick={fetchSubs} className="p-2.5 bg-white/5 border border-white/10 rounded-xl text-white/40 hover:text-white transition-colors">
               <RefreshCcw className={`w-5 h-5 ${loading ? 'animate-spin text-amber-400' : ''}`} />
             </button>
           </div>
         </div>
 
-        {/* Table Container */}
+        {/* Table */}
         <div className="bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
           <table className="w-full text-sm border-collapse">
             <thead className="bg-white/[0.02] text-white/30 uppercase text-[10px] tracking-[2px] font-bold">
@@ -172,21 +167,18 @@ export default function AdminSubscriptionsPage() {
               {filteredSubs.length > 0 ? (
                 filteredSubs.map((sub) => (
                   <tr key={sub.id} className="hover:bg-white/[0.01] transition-colors group">
-                    <td className="p-5 font-medium">
+                    <td className="p-5">
                       <div className="flex flex-col">
-                        <span>{sub.user.email}</span>
+                        <span className="font-medium">{sub.user.email}</span>
                         <span className="text-[10px] text-white/20 font-mono">{sub.id.slice(-8)}</span>
                       </div>
                     </td>
                     <td className="p-5 text-white/70">{sub.magazine.title}</td>
-
-                    {/* Updated Payment Status Column */}
                     <td className="p-5">
                       <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${getStatusStyles(sub.paymentStatus)}`}>
                         {sub.paymentStatus}
                       </span>
                     </td>
-
                     <td className="p-5">
                       <div className="flex items-center gap-2">
                         {sub.isActive ? <CheckCircle2 className="text-emerald-400 w-4 h-4" /> : <XCircle className="text-white/20 w-4 h-4" />}
@@ -197,16 +189,23 @@ export default function AdminSubscriptionsPage() {
                     </td>
                     <td className="p-5">
                       <div className="flex flex-col gap-1">
-                        <span className="text-white/50 font-mono text-xs">
-                          {sub.expiryDate ? new Date(sub.expiryDate).toLocaleDateString('en-GB') : "LIFETIME"}
-                        </span>
-                        {sub.expiryDate && new Date(sub.expiryDate) < new Date() && (
-                          <span className="text-[9px] text-red-400 uppercase font-bold">Expired</span>
+                        {sub.expiryDate ? (
+                          <>
+                            <span className="text-white/50 font-mono text-xs">
+                              {new Date(sub.expiryDate).toLocaleDateString('en-GB')}
+                            </span>
+                            {new Date(sub.expiryDate) < new Date() && (
+                              <span className="text-[9px] text-red-400 uppercase font-bold">Expired</span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-amber-500/40 text-[10px] italic">No Date Set</span>
                         )}
                       </div>
                     </td>
                     <td className="p-5">
                       <div className="flex justify-end gap-2">
+                        {/* Add 30 Days Button */}
                         <button
                           onClick={() => handleApprove30Days(sub)}
                           disabled={updatingId === sub.id}
@@ -216,8 +215,16 @@ export default function AdminSubscriptionsPage() {
                           <Calendar className="w-4 h-4" />
                         </button>
 
+                        {/* Grant/Revoke Button - Now with Auto-Date for Grant */}
                         <button
-                          onClick={() => updateSubscription(sub.id, { isActive: !sub.isActive })}
+                          disabled={updatingId === sub.id}
+                          onClick={() => {
+                            if (!sub.isActive) {
+                              handleGrantInitialAccess(sub);
+                            } else {
+                              updateSubscription(sub.id, { isActive: false });
+                            }
+                          }}
                           className={`px-3 py-1 text-xs rounded-lg border transition ${sub.isActive
                             ? "border-white/10 text-white hover:bg-white/5"
                             : "border-amber-400/50 text-amber-400 hover:bg-amber-400 hover:text-zinc-950"
@@ -238,9 +245,7 @@ export default function AdminSubscriptionsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="p-20 text-center text-white/20 italic">
-                    No subscriptions found matching your search.
-                  </td>
+                  <td colSpan={6} className="p-20 text-center text-white/20 italic">No subscriptions found.</td>
                 </tr>
               )}
             </tbody>
@@ -250,8 +255,6 @@ export default function AdminSubscriptionsPage() {
     </div>
   )
 }
-
-
 
 // "use client"
 
