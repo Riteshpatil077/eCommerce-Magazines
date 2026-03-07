@@ -40,6 +40,7 @@ export default function UserSearch() {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Search by name or email..."
+        suppressHydrationWarning
         className="w-full bg-zinc-900 border border-white/5 rounded-xl pl-11 pr-10 py-2.5 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 transition-all"
       />
       {value && (
