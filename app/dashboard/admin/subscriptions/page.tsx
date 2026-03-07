@@ -84,16 +84,10 @@ export default function AdminSubscriptionsPage() {
   // --- Actions ---
 
   async function updateSubscription(id: string, updates: any) {
-<<<<<<< HEAD
     // Only declare toastId once
     const toastId = toast.loading("Updating subscription...")
     setUpdatingId(id)
 
-=======
-   const toastId = toast.loading("Updating subscription...") 
-    setUpdatingId(id)
-    // Loading Toast
->>>>>>> 795e929b28dc73d04e8fea1bd86ca13fdcfa5c0b
     try {
       const res = await fetch(`/api/admin/subscriptions/${id}`, {
         method: "PUT",
@@ -139,11 +133,6 @@ export default function AdminSubscriptionsPage() {
 
     const toastId = toast.loading("Deleting record...")
     setUpdatingId(id)
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> 795e929b28dc73d04e8fea1bd86ca13fdcfa5c0b
     try {
       const res = await fetch(`/api/admin/subscriptions/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
