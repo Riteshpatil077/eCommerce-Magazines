@@ -9,25 +9,16 @@ import { User, Mail, Lock, ArrowRight, BookOpen, Sparkles, Loader2 } from "lucid
 export default function RegisterForm() {
   const [state, formAction, isPending] = useActionState(registerAction, null)
 
-<<<<<<< HEAD
+  // Inside LoginForm.tsx
+
   useEffect(() => {
     if (state?.error) {
-      toast.error(state.error)
-    } else if (state && !state.error) {
-      toast.success("Account created successfully")
-    }
-  }, [state])
-=======
-// Inside LoginForm.tsx
-
-useEffect(() => {
-    if (state?.error) {
       toast.error(state.error);
-    } 
-    
+    }
+
     if (state?.success) {
       toast.success("Welcome to Pressly!");
-      
+
       const path = state.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user";
 
       const timer = setTimeout(() => {
@@ -37,7 +28,6 @@ useEffect(() => {
       return () => clearTimeout(timer);
     }
   }, [state]);
->>>>>>> 795e929b28dc73d04e8fea1bd86ca13fdcfa5c0b
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 flex items-center justify-center px-4">
@@ -68,7 +58,7 @@ useEffect(() => {
 
         {/* Card */}
         <div className="bg-zinc-900 border border-white/5 rounded-2xl p-8">
-          <form action={formAction} className="space-y-5">
+          <form action={formAction} className="space-y-5" suppressHydrationWarning>
 
             {/* Name */}
             <div className="space-y-2">
@@ -82,6 +72,7 @@ useEffect(() => {
                   type="text"
                   placeholder="Arjun Sharma"
                   className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
+                  suppressHydrationWarning
                 />
               </div>
             </div>
@@ -98,6 +89,7 @@ useEffect(() => {
                   type="email"
                   placeholder="you@example.com"
                   className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
+                  suppressHydrationWarning
                 />
               </div>
             </div>
@@ -114,6 +106,7 @@ useEffect(() => {
                   type="password"
                   placeholder="••••••••"
                   className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
+                  suppressHydrationWarning
                 />
               </div>
               <p className="text-[11px] text-white/20 pl-1">Minimum 8 characters recommended</p>
@@ -122,10 +115,11 @@ useEffect(() => {
             <div className="h-px bg-white/5" />
 
             {/* Submit */}
-           <button
+            <button
               type="submit"
               disabled={isPending}
               className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold text-sm py-3.5 rounded-xl tracking-wide transition-all duration-200 group"
+              suppressHydrationWarning
             >
               {isPending ? (
                 <>

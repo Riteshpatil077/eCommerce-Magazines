@@ -37,6 +37,7 @@ export function RemoveButton({ cartId }: { cartId: string }) {
             onClick={handleRemove}
             disabled={pending}
             className="flex items-center gap-2 text-white/20 hover:text-rose-400 transition-colors py-2 px-3 rounded-lg hover:bg-rose-400/5 disabled:opacity-50 disabled:cursor-not-allowed group"
+            suppressHydrationWarning
         >
             {pending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

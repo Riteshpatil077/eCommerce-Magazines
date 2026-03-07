@@ -45,6 +45,7 @@ export function AddToCartButton({
             onClick={handleAdd}
             disabled={pending}
             className={className}
+            suppressHydrationWarning
         >
             {pending ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />

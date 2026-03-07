@@ -131,6 +131,7 @@ export default function AddMagazinePage() {
                   className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-8 pr-4 py-3 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
+                  onWheel={(e) => (e.target as HTMLInputElement).blur()}
                   required
                 />
               </div>
@@ -146,9 +147,10 @@ export default function AddMagazinePage() {
                   type="number"
                   min="0"
                   placeholder="Enter available stock"
-                  className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm"
+                  className="w-full bg-zinc-800 border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-stone-100 placeholder:text-white/20 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
+                  onWheel={(e) => (e.target as HTMLInputElement).blur()}
                   required
                 />
               </div>

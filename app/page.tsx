@@ -16,20 +16,25 @@ export default function LandingPage() {
 
       {/* ── Navbar ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-6 bg-zinc-950/70 backdrop-blur-xl border-b border-white/5">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20 transition-transform group-hover:scale-110">
-            <BookOpen className="w-4 h-4 text-zinc-950" strokeWidth={2.5} />
-          </div>
-          <span className="text-xl font-bold tracking-tight italic">Pressly</span>
-        </Link>
+        {/* Left: Brand */}
+        <div className="flex border-none items-center justify-start flex-1">
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20 transition-transform group-hover:scale-110">
+              <BookOpen className="w-4 h-4 text-zinc-950" strokeWidth={2.5} />
+            </div>
+            <span className="text-xl font-bold tracking-tight italic">Pressly</span>
+          </Link>
+        </div>
 
-        <div className="hidden md:flex items-center gap-10 text-[11px] uppercase tracking-[0.2em] font-bold text-white/40">
+        {/* Center: Links */}
+        <div className="hidden md:flex items-center justify-center gap-6 lg:gap-10 text-[11px] uppercase tracking-[0.2em] font-bold text-white/40">
           <Link href="/store" className="hover:text-amber-400 transition-colors">Catalogue</Link>
           <Link href="#features" className="hover:text-amber-400 transition-colors">Experience</Link>
           <Link href="#pricing" className="hover:text-amber-400 transition-colors">Memberships</Link>
         </div>
 
-        <div className="flex items-center gap-6">
+        {/* Right: Actions */}
+        <div className="flex items-center justify-end gap-6 flex-1 shrink-0">
           <Link href="/login" className="text-[10px] uppercase tracking-widest font-bold text-white/40 hover:text-white transition-colors hidden sm:block">
             Login
           </Link>

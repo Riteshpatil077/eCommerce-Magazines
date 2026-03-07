@@ -31,31 +31,37 @@ export async function subscribeAction(formData: FormData) {
   expiryDate.setMonth(expiryDate.getMonth() + 1) // Handles 30/31 days and leap years automatically
 
   // 2. Database Update
-  const sub = await prisma.subscription.upsert({
-    where: {
-      userId_magazineId: {
+  // We use a transaction to ensure we decrement stock and create the subscription safely
+  const [sub] = await prisma.$transaction([
+    prisma.subscription.upsert({
+      where: {
+        userId_magazineId: {
+          userId: userId,
+          magazineId: magazineId,
+        },
+      },
+      update: {
+        isActive: false,       // Stays false until Admin approves
+        paymentStatus: "PENDING",
+        startDate: startDate,
+        expiryDate: expiryDate,
+        updatedAt: new Date(),
+      },
+      create: {
         userId: userId,
         magazineId: magazineId,
+        isActive: false,
+        paymentStatus: "PENDING",
+        startDate: startDate,
+        expiryDate: expiryDate,
       },
-    },
-    update: {
-      isActive: false,       // Stays false until Admin approves
-      paymentStatus: "PENDING",
-      startDate: startDate,
-      expiryDate: expiryDate,
-      updatedAt: new Date(),
-    },
-    create: {
-      userId: userId,
-      magazineId: magazineId,
-      isActive: false,
-      paymentStatus: "PENDING",
-      startDate: startDate,
-      expiryDate: expiryDate,
-    },
-    include: { magazine: true } // Grab the slug while we're at it
-  })
-
+      include: { magazine: true } // Grab the slug while we're at it
+    }),
+    prisma.magazine.update({
+      where: { id: magazineId },
+      data: { stock: { decrement: 1 } }
+    })
+  ])
   // 3. Clear Cache and Redirect
   revalidatePath("/dashboard/user")
 

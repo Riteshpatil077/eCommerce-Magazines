@@ -68,7 +68,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       {/* Added fonts to className and ensured a dark base if that's your theme */}
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-950 text-stone-100`}>
         {children}

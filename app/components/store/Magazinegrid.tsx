@@ -12,6 +12,7 @@ interface Magazine {
   coverImage: string
   description?: string | null
   category?: string | null
+  stock?: number
   createdAt: string | Date
 }
 
@@ -251,9 +252,14 @@ const MagazineCard = memo(function MagazineCard({
         <h3 className="text-xs font-serif font-bold text-stone-100 truncate mb-0.5 leading-tight">
           {mag.title}
         </h3>
-        <p className="text-[10px] text-amber-400 font-medium mb-2">
-          {isSubscribed ? "Access Unlocked" : `₹${mag.price}/mo`}
-        </p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[10px] text-amber-400 font-medium pb-0">
+            {isSubscribed ? "Access Unlocked" : `₹${mag.price}/mo`}
+          </p>
+          <p className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm ${mag.stock && mag.stock > 0 ? "bg-amber-400/10 text-amber-400" : "bg-red-500/10 text-red-500"}`}>
+            {(mag.stock && mag.stock > 0) ? `${mag.stock} Left` : "Out of Stock"}
+          </p>
+        </div>
 
         {/* Hover actions */}
         <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-250">
@@ -264,7 +270,7 @@ const MagazineCard = memo(function MagazineCard({
             >
               Read Now
             </Link>
-          ) : (
+          ) : (mag.stock && mag.stock > 0) ? (
             <>
               <AddToCartButton magazineId={mag.id} title={mag.title} />
               <Link
@@ -274,6 +280,13 @@ const MagazineCard = memo(function MagazineCard({
                 Subscribe
               </Link>
             </>
+          ) : (
+            <button
+              disabled
+              className="block text-[9px] uppercase font-black tracking-wider bg-zinc-800 text-white/50 py-1.5 text-center rounded-lg cursor-not-allowed"
+            >
+              Unavailable
+            </button>
           )}
         </div>
       </div>

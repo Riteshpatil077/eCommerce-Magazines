@@ -22,6 +22,7 @@ const getMagazines = unstable_cache(
       price: true,
       coverImage: true,
       description: true,
+      stock: true,
       createdAt: true,
     },
   }),
@@ -128,14 +129,18 @@ export default async function StorePage() {
                   {subSet.has(featured.id) ? "Continue Reading" : "Explore Issue"}
                 </Link>
 
-                {!subSet.has(featured.id) && (
+                {!subSet.has(featured.id) && (featured.stock && featured.stock > 0) ? (
                   <AddToCartButton
                     magazineId={featured.id}
                     title={featured.title}
                     price={featured.price}
                     className="flex items-center gap-2 border border-white/20 hover:border-white/40 text-white/70 hover:text-stone-100 px-6 py-3.5 rounded-2xl text-sm transition-all"
                   />
-                )}
+                ) : !subSet.has(featured.id) ? (
+                  <button disabled className="flex items-center gap-2 border border-white/5 bg-zinc-900/50 text-white/40 px-6 py-3.5 rounded-2xl text-sm cursor-not-allowed uppercase tracking-widest font-bold">
+                    Out of Stock
+                  </button>
+                ) : null}
               </div>
             </div>
           </section>

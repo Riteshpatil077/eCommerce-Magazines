@@ -20,12 +20,13 @@ export default function SubscribeForm({ magazineId, price }: { magazineId: strin
     }
 
     return (
-        <form action={handleSubmit}>
-            <input type="hidden" name="magazineId" value={magazineId} />
+        <form action={handleSubmit} suppressHydrationWarning>
+            <input type="hidden" name="magazineId" value={magazineId} suppressHydrationWarning />
             <button
                 type="submit"
                 disabled={isPending}
                 className="flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold px-8 py-3.5 rounded-xl text-sm tracking-wide transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+                suppressHydrationWarning
             >
                 {isPending ? (
                     <>
