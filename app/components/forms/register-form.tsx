@@ -5,14 +5,30 @@ import { registerAction } from "../../actions/auth.actions"
 import toast from "react-hot-toast"
 import { useEffect } from "react"
 import Link from "next/link"
-import { User, Mail, Lock, ArrowRight, BookOpen, Sparkles } from "lucide-react"
+import { User, Mail, Lock, ArrowRight, BookOpen, Sparkles, Loader2 } from "lucide-react"
 
 export default function RegisterForm() {
-  const [state, formAction] = useActionState(registerAction, null)
+  const [state, formAction, isPending] = useActionState(registerAction, null)
 
-  useEffect(() => {
-    if (state?.error) toast.error(state.error)
-  }, [state])
+// Inside LoginForm.tsx
+
+useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error);
+    } 
+    
+    if (state?.success) {
+      toast.success("Welcome to Pressly!");
+      
+      const path = state.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user";
+
+      const timer = setTimeout(() => {
+        window.location.href = path;
+      }, 800);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 flex items-center justify-center px-4">
@@ -97,14 +113,23 @@ export default function RegisterForm() {
             <div className="h-px bg-white/5" />
 
             {/* Submit */}
-            <button
+           <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold text-sm py-3.5 rounded-xl tracking-wide transition-all duration-200 group"
+              disabled={isPending}
+              className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold text-sm py-3.5 rounded-xl tracking-wide transition-all duration-200 group"
             >
-              Create account
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-150" />
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  Create account
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-150" />
+                </>
+              )}
             </button>
-
             {/* Terms note */}
             <p className="text-center text-[11px] text-white/20 leading-relaxed">
               By registering you agree to our{" "}

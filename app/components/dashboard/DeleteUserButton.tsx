@@ -22,15 +22,16 @@ export default function DeleteUserButton({ userId }: { userId: string }) {
             const result = await deleteUser(userId)
 
             if (result.success) {
-                // 3. Success toast
+                // 3. Update to success toast
                 toast.success("User deleted successfully", { id: toastId })
                 router.refresh()
             } else {
-                // 4. Error toast with specific message
+                // 4. Update to error toast with specific message
                 toast.error(result.error || "Failed to delete user", { id: toastId })
             }
         } catch (err) {
-            toast.error("An unexpected error occurred", { id: toastId })
+            // 5. Update to generic error toast
+            toast.error("An unexpected error occurred.", { id: toastId })
         } finally {
             setIsPending(false)
         }
@@ -41,15 +42,15 @@ export default function DeleteUserButton({ userId }: { userId: string }) {
             {/* Note: If you already have a Toaster in your global layout, 
                you can remove this Toaster component.
             */}
-            <Toaster 
-                position="top-right" 
+            <Toaster
+                position="top-right"
                 toastOptions={{
                     style: {
                         background: '#18181b', // zinc-900
                         color: '#f5f5f4',      // stone-100
                         border: '1px solid rgba(255,255,255,0.1)'
                     }
-                }} 
+                }}
             />
 
             <button

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import Link from "next/link"
 import { addToCart } from "@/app/actions/cart.actions"
 import { ShoppingCart, BookOpen, Search, X, SlidersHorizontal, ChevronDown } from "lucide-react"
+import { toast } from "react-hot-toast"
 
 interface Magazine {
   id: string
@@ -57,10 +58,10 @@ export default function MagazineGrid({ magazines, subscribedIds }: MagazineGridP
     const q = debouncedQuery.toLowerCase().trim()
     let list = q
       ? magazines.filter(m =>
-          m.title.toLowerCase().includes(q) ||
-          m.category?.toLowerCase().includes(q) ||
-          m.description?.toLowerCase().includes(q)
-        )
+        m.title.toLowerCase().includes(q) ||
+        m.category?.toLowerCase().includes(q) ||
+        m.description?.toLowerCase().includes(q)
+      )
       : [...magazines]
 
     switch (sort) {
@@ -221,6 +222,24 @@ const MagazineCard = memo(function MagazineCard({
   isSubscribed: boolean
   priority: boolean
 }) {
+
+  // Handled with toast notification
+  const handleAddToCart = async (formData: FormData) => {
+    const toastId = toast.loading("Adding to cart...")
+    try {
+      const result = await addToCart(formData)
+
+      // Checking for the expected return from your cart action
+      if (result?.error) {
+        toast.error(result.error, { id: toastId })
+      } else {
+        toast.success(`${mag.title} added to cart!`, { id: toastId })
+      }
+    } catch (error) {
+      toast.error("Failed to add to cart", { id: toastId })
+    }
+  }
+
   return (
     <div className="relative aspect-[3/4] rounded-xl overflow-hidden group bg-zinc-900 border border-white/5 hover:border-amber-400/20 transition-all duration-300">
 

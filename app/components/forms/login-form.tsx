@@ -2,18 +2,34 @@
 
 import { useActionState, useEffect } from "react" // Added useEffect
 import { loginAction } from "@/app/actions/auth.actions"
-import toast from "react-hot-toast"
+import { toast } from "react-hot-toast"
 import Link from "next/link"
 import { Mail, Lock, ArrowRight, BookOpen, Loader2 } from "lucide-react" // Added Loader2
 
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
 
-  useEffect(() => {
-    if (state?.error) {
-      toast.error(state.error)
-    }
-  }, [state])
+ // Inside LoginForm.tsx
+
+useEffect(() => {
+  if (state?.error) {
+    toast.error(state.error);
+  } 
+  
+  if (state?.success) {
+    toast.success("Welcome to Pressly!");
+    
+    // Determine redirect path based on role
+    const path = state.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user";
+
+    // Give the user 800ms to actually see the toast before the page disappears
+    const timer = setTimeout(() => {
+      window.location.href = path; // Using location.href ensures a fresh state
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }
+}, [state]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 flex items-center justify-center px-4">

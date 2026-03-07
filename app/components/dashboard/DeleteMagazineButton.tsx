@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Trash2, Loader2 } from "lucide-react"
+// 1. Import toast
+import toast from "react-hot-toast"
 
 export default function DeleteMagazineButton({ id, title }: { id: string, title: string }) {
   const [loading, setLoading] = useState(false)
@@ -12,16 +14,22 @@ export default function DeleteMagazineButton({ id, title }: { id: string, title:
     if (!confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return
 
     setLoading(true)
+    // 2. Start a loading toast
+    const toastId = toast.loading(`Deleting ${title}...`)
+
     try {
       const res = await fetch(`/api/admin/magazines/${id}`, {
         method: "DELETE",
       })
 
       if (!res.ok) throw new Error("Failed to delete")
-      
-      router.refresh() // Refresh the server component data
+
+      // 3. Update to success toast
+      toast.success(`${title} deleted`, { id: toastId })
+      router.refresh()
     } catch (err) {
-      alert("Error deleting magazine")
+      // 4. Update to error toast
+      toast.error("Error deleting magazine", { id: toastId })
     } finally {
       setLoading(false)
     }
