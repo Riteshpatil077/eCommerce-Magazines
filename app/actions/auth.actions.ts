@@ -47,7 +47,7 @@ export async function registerAction(prevState: any, formData: FormData) {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   })
 
- 
+
   return { success: true, role: user.role };
 }
 
@@ -79,11 +79,6 @@ export async function loginAction(prevState: any, formData: FormData) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   })
-
-  if (user.role === "ADMIN") {
-    redirect("/dashboard/admin")
-  }
-
 
   return { success: true, role: user.role };
 }

@@ -41,6 +41,8 @@ export default async function MagazinePage({ params }: PageProps) {
     })
   ])
 
+  if (!magazine) return notFound()
+
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100">
 
