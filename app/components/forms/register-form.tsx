@@ -9,6 +9,7 @@ import { User, Mail, Lock, ArrowRight, BookOpen, Sparkles, Loader2 } from "lucid
 export default function RegisterForm() {
   const [state, formAction, isPending] = useActionState(registerAction, null)
 
+<<<<<<< HEAD
   useEffect(() => {
     if (state?.error) {
       toast.error(state.error)
@@ -16,6 +17,27 @@ export default function RegisterForm() {
       toast.success("Account created successfully")
     }
   }, [state])
+=======
+// Inside LoginForm.tsx
+
+useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error);
+    } 
+    
+    if (state?.success) {
+      toast.success("Welcome to Pressly!");
+      
+      const path = state.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user";
+
+      const timer = setTimeout(() => {
+        window.location.href = path;
+      }, 800);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
+>>>>>>> 795e929b28dc73d04e8fea1bd86ca13fdcfa5c0b
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 flex items-center justify-center px-4">
@@ -100,7 +122,7 @@ export default function RegisterForm() {
             <div className="h-px bg-white/5" />
 
             {/* Submit */}
-            <button
+           <button
               type="submit"
               disabled={isPending}
               className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold text-sm py-3.5 rounded-xl tracking-wide transition-all duration-200 group"
@@ -117,7 +139,6 @@ export default function RegisterForm() {
                 </>
               )}
             </button>
-
             {/* Terms note */}
             <p className="text-center text-[11px] text-white/20 leading-relaxed">
               By registering you agree to our{" "}
