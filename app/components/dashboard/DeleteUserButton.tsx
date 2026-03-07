@@ -5,7 +5,7 @@ import { deleteUser } from "@/app/lib/actions"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 // 1. Import toast
-import toast from "react-hot-toast"
+import toast, { Toaster } from "react-hot-toast"
 
 export default function DeleteUserButton({ userId }: { userId: string }) {
     const [isPending, setIsPending] = useState(false)
@@ -14,9 +14,9 @@ export default function DeleteUserButton({ userId }: { userId: string }) {
     const handleDelete = async () => {
         if (!confirm("Are you sure you want to delete this user?")) return
 
+        // 2. Start loading toast
+        const toastId = toast.loading("Deleting user...")
         setIsPending(true)
-        // 2. Start a loading toast
-        const toastId = toast.loading("Processing request...")
 
         try {
             const result = await deleteUser(userId)
@@ -38,16 +38,32 @@ export default function DeleteUserButton({ userId }: { userId: string }) {
     }
 
     return (
-        <button
-            onClick={handleDelete}
-            disabled={isPending}
-            className="p-2 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all disabled:opacity-50"
-        >
-            {isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-                <Trash2 className="w-4 h-4" />
-            )}
-        </button>
+        <>
+            {/* Note: If you already have a Toaster in your global layout, 
+               you can remove this Toaster component.
+            */}
+            <Toaster
+                position="top-right"
+                toastOptions={{
+                    style: {
+                        background: '#18181b', // zinc-900
+                        color: '#f5f5f4',      // stone-100
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }
+                }}
+            />
+
+            <button
+                onClick={handleDelete}
+                disabled={isPending}
+                className="p-2 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all disabled:opacity-50"
+            >
+                {isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                    <Trash2 className="w-4 h-4" />
+                )}
+            </button>
+        </>
     )
 }
