@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import Link from "next/link"
-import { addToCart } from "@/app/actions/cart.actions"
 import { ShoppingCart, BookOpen, Search, X, SlidersHorizontal, ChevronDown } from "lucide-react"
-import { toast } from "react-hot-toast"
 
 interface Magazine {
   id: string
@@ -14,7 +12,7 @@ interface Magazine {
   coverImage: string
   description?: string | null
   category?: string | null
-  createdAt: string
+  createdAt: string | Date
 }
 
 interface MagazineGridProps {
@@ -212,6 +210,7 @@ export default function MagazineGrid({ magazines, subscribedIds }: MagazineGridP
 
 /* ── Individual card — memoized to prevent unnecessary re-renders ── */
 import { memo } from "react"
+import { AddToCartButton } from "../cart/AddToCartButton"
 
 const MagazineCard = memo(function MagazineCard({
   mag,
@@ -223,22 +222,7 @@ const MagazineCard = memo(function MagazineCard({
   priority: boolean
 }) {
 
-  // Handled with toast notification
-  const handleAddToCart = async (formData: FormData) => {
-    const toastId = toast.loading("Adding to cart...")
-    try {
-      const result = await addToCart(formData)
 
-      // Checking for the expected return from your cart action
-      if (result?.error) {
-        toast.error(result.error, { id: toastId })
-      } else {
-        toast.success(`${mag.title} added to cart!`, { id: toastId })
-      }
-    } catch (error) {
-      toast.error("Failed to add to cart", { id: toastId })
-    }
-  }
 
   return (
     <div className="relative aspect-[3/4] rounded-xl overflow-hidden group bg-zinc-900 border border-white/5 hover:border-amber-400/20 transition-all duration-300">
@@ -282,16 +266,7 @@ const MagazineCard = memo(function MagazineCard({
             </Link>
           ) : (
             <>
-              <form action={addToCart}>
-                <input type="hidden" name="magazineId" value={mag.id} />
-                <button
-                  type="submit"
-                  className="w-full text-[9px] uppercase font-black tracking-wider bg-white/10 hover:bg-white/20 border border-white/10 text-white py-1.5 rounded-lg transition-colors flex items-center justify-center gap-1"
-                >
-                  <ShoppingCart className="w-2.5 h-2.5" strokeWidth={2.5} />
-                  Cart
-                </button>
-              </form>
+              <AddToCartButton magazineId={mag.id} title={mag.title} />
               <Link
                 href={`/store/${mag.slug}`}
                 className="block text-[9px] uppercase font-black tracking-wider bg-amber-400 hover:bg-amber-300 text-zinc-950 py-1.5 text-center rounded-lg transition-colors"

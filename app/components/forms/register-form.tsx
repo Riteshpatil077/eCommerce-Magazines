@@ -1,17 +1,20 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 import { registerAction } from "../../actions/auth.actions"
 import toast from "react-hot-toast"
-import { useEffect } from "react"
 import Link from "next/link"
-import { User, Mail, Lock, ArrowRight, BookOpen, Sparkles } from "lucide-react"
+import { User, Mail, Lock, ArrowRight, BookOpen, Sparkles, Loader2 } from "lucide-react"
 
 export default function RegisterForm() {
-  const [state, formAction] = useActionState(registerAction, null)
+  const [state, formAction, isPending] = useActionState(registerAction, null)
 
   useEffect(() => {
-    if (state?.error) toast.error(state.error)
+    if (state?.error) {
+      toast.error(state.error)
+    } else if (state && !state.error) {
+      toast.success("Account created successfully")
+    }
   }, [state])
 
   return (
@@ -99,10 +102,20 @@ export default function RegisterForm() {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold text-sm py-3.5 rounded-xl tracking-wide transition-all duration-200 group"
+              disabled={isPending}
+              className="w-full flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold text-sm py-3.5 rounded-xl tracking-wide transition-all duration-200 group"
             >
-              Create account
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-150" />
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  Create account
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-150" />
+                </>
+              )}
             </button>
 
             {/* Terms note */}

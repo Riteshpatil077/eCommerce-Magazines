@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
@@ -14,8 +13,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react"
-// 1. Import Toast components
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 
 type Subscription = {
   id: string
@@ -43,7 +41,7 @@ export default function AdminSubscriptionsPage() {
       setSubs(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error("Fetch failed:", error)
-      toast.error("Failed to load subscriptions") // Added toast
+      toast.error("Failed to load subscriptions")
       setSubs([])
     } finally {
       setLoading(false)
@@ -83,12 +81,13 @@ export default function AdminSubscriptionsPage() {
     return "text-zinc-400 border-zinc-500/20";
   };
 
-  // --- Actions with Toast ---
+  // --- Actions ---
 
   async function updateSubscription(id: string, updates: any) {
+    // Only declare toastId once
     const toastId = toast.loading("Updating subscription...")
     setUpdatingId(id)
-    const toastId = toast.loading("Updating subscription...") // Loading Toast
+
     try {
       const res = await fetch(`/api/admin/subscriptions/${id}`, {
         method: "PUT",
@@ -99,9 +98,9 @@ export default function AdminSubscriptionsPage() {
       if (!res.ok) throw new Error()
 
       await fetchSubs()
-      toast.success("Updated successfully!", { id: toastId }) // Success Toast
+      toast.success("Updated successfully!", { id: toastId })
     } catch (error) {
-      toast.error("Update failed. Please try again.", { id: toastId }) // Error Toast
+      toast.error("Update failed. Please try again.", { id: toastId })
     } finally {
       setUpdatingId(null)
     }
@@ -134,7 +133,7 @@ export default function AdminSubscriptionsPage() {
 
     const toastId = toast.loading("Deleting record...")
     setUpdatingId(id)
-    const toastId = toast.loading("Deleting...")
+
     try {
       const res = await fetch(`/api/admin/subscriptions/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
@@ -158,20 +157,8 @@ export default function AdminSubscriptionsPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 p-8">
-      {/* 2. Toaster component renders the messages */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: '#18181b', // matches zinc-900
-            color: '#fff',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }
-        }}
-      />
 
       <div className="max-w-7xl mx-auto">
-
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <div>
@@ -298,7 +285,8 @@ export default function AdminSubscriptionsPage() {
 
                             <button
                               onClick={() => deleteSubscription(sub.id)}
-                              className="p-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                              disabled={updatingId === sub.id}
+                              className="p-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -317,7 +305,7 @@ export default function AdminSubscriptionsPage() {
           </div>
 
           {/* Pagination Footer */}
-          <div className="px-6 py-4 bg-white/[0.02] border-t border-white/5 flex flex-col sm:row items-center justify-between gap-4">
+          <div className="px-6 py-4 bg-white/[0.02] border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs text-white/40">
               Showing <span className="text-white font-medium">{paginatedSubs.length}</span> of <span className="text-white font-medium">{filteredSubs.length}</span> records
             </p>

@@ -1,6 +1,7 @@
 import { ArrowLeft, MapPin, Phone, User, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 import { processOrder } from "@/app/actions/checkout.actions"
+// Toaster is globally imported in layout
 
 export default function CheckoutPage() {
     return (

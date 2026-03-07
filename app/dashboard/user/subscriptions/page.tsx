@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react"
 import { CheckCircle2, XCircle, Loader2, Trash2, RefreshCcw, Calendar, Search } from "lucide-react"
+import toast from "react-hot-toast" // ✅ Added toast import
 
 type Subscription = {
   id: string
@@ -16,36 +17,27 @@ export default function AdminSubscriptionsPage() {
   const [subs, setSubs] = useState<Subscription[]>([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
-
-  // Search and Filter States
   const [searchQuery, setSearchQuery] = useState("")
 
-  async function fetchSubs() {
+  async function fetchSubs(isRefresh = false) {
     try {
-      setLoading(true)
-
+      if (!isRefresh) setLoading(true)
       const res = await fetch("/api/admin/subscriptions")
 
-      // 🔥 VERY IMPORTANT CHECK
-      if (!res.ok) {
-        const text = await res.text()
-        console.error("API ERROR:", text)
-        throw new Error("Failed to fetch")
-      }
+      if (!res.ok) throw new Error("Failed to fetch")
 
       const text = await res.text()
-
       if (!text) {
-        console.error("Empty response from API")
         setSubs([])
         return
       }
 
       const data = JSON.parse(text)
       setSubs(data)
-
+      if (isRefresh) toast.success("Data synchronized") // ✅ Success toast on refresh
     } catch (error) {
       console.error("Fetch Error:", error)
+      toast.error("Could not load subscriptions") // ✅ Error toast
     } finally {
       setLoading(false)
     }
@@ -53,7 +45,6 @@ export default function AdminSubscriptionsPage() {
 
   useEffect(() => { fetchSubs() }, [])
 
-  // Optimized Search Logic (searches Email, Title, Status, and Access)
   const filteredSubs = useMemo(() => {
     return subs.filter((sub) => {
       const searchStr = searchQuery.toLowerCase();
@@ -69,30 +60,30 @@ export default function AdminSubscriptionsPage() {
     });
   }, [subs, searchQuery]);
 
-  // COLOR LOGIC FOR PAYMENT STATUS
   const getStatusStyles = (status: string) => {
     const s = status.toUpperCase();
-    if (s === "APPROVED" || s === "SUCCESS") {
-      return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-    }
-    if (s === "REJECTED" || s === "FAILED") {
-      return "bg-red-500/10 text-red-400 border border-red-500/20";
-    }
-    if (s === "PENDING") {
-      return "bg-orange-500/10 text-orange-400 border border-orange-500/20";
-    }
+    if (s === "APPROVED" || s === "SUCCESS") return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+    if (s === "REJECTED" || s === "FAILED") return "bg-red-500/10 text-red-400 border border-red-500/20";
+    if (s === "PENDING") return "bg-orange-500/10 text-orange-400 border border-orange-500/20";
     return "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20";
   };
 
   async function updateSubscription(id: string, updates: any) {
+    const toastId = toast.loading("Updating record...") // ✅ Loading toast
     setUpdatingId(id)
     try {
-      await fetch(`/api/admin/subscriptions/${id}`, {
+      const res = await fetch(`/api/admin/subscriptions/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
       })
+
+      if (!res.ok) throw new Error()
+
       await fetchSubs()
+      toast.success("Update successful", { id: toastId }) // ✅ Replace loading with success
+    } catch (error) {
+      toast.error("Failed to update", { id: toastId }) // ✅ Replace loading with error
     } finally {
       setUpdatingId(null)
     }
@@ -112,10 +103,17 @@ export default function AdminSubscriptionsPage() {
 
   async function deleteSubscription(id: string) {
     if (!confirm("Are you sure? This user will lose access immediately.")) return
+
+    const toastId = toast.loading("Deleting subscription...") // ✅ Loading toast
     setUpdatingId(id)
     try {
-      await fetch(`/api/admin/subscriptions/${id}`, { method: "DELETE" })
+      const res = await fetch(`/api/admin/subscriptions/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error()
+
       await fetchSubs()
+      toast.success("Subscription deleted", { id: toastId })
+    } catch (error) {
+      toast.error("Delete failed", { id: toastId })
     } finally {
       setUpdatingId(null)
     }
@@ -131,9 +129,8 @@ export default function AdminSubscriptionsPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 p-8">
-      <div className="max-w-7xl mx-auto">
 
-        {/* Header Section */}
+      <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <div>
             <h1 className="text-3xl font-serif">
@@ -143,7 +140,6 @@ export default function AdminSubscriptionsPage() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
-            {/* Search Bar */}
             <div className="relative flex-1 md:w-80">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
               <input
@@ -156,7 +152,7 @@ export default function AdminSubscriptionsPage() {
             </div>
 
             <button
-              onClick={fetchSubs}
+              onClick={() => fetchSubs(true)} // Pass true to show success toast
               className="p-2.5 bg-white/5 border border-white/10 rounded-xl text-white/40 hover:text-white transition-colors"
             >
               <RefreshCcw className={`w-5 h-5 ${loading ? 'animate-spin text-amber-400' : ''}`} />
@@ -164,7 +160,6 @@ export default function AdminSubscriptionsPage() {
           </div>
         </div>
 
-        {/* Table Container */}
         <div className="bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
           <table className="w-full text-sm border-collapse">
             <thead className="bg-white/[0.02] text-white/30 uppercase text-[10px] tracking-[2px] font-bold">
@@ -190,7 +185,6 @@ export default function AdminSubscriptionsPage() {
                     </td>
                     <td className="p-5 text-white/70">{sub.magazine.title}</td>
 
-                    {/* Updated Payment Status Column */}
                     <td className="p-5">
                       <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${getStatusStyles(sub.paymentStatus)}`}>
                         {sub.paymentStatus}
@@ -227,6 +221,7 @@ export default function AdminSubscriptionsPage() {
                         </button>
 
                         <button
+                          disabled={updatingId === sub.id}
                           onClick={() => updateSubscription(sub.id, { isActive: !sub.isActive })}
                           className={`px-3 py-1 text-xs rounded-lg border transition ${sub.isActive
                             ? "border-white/10 text-white hover:bg-white/5"
@@ -238,7 +233,8 @@ export default function AdminSubscriptionsPage() {
 
                         <button
                           onClick={() => deleteSubscription(sub.id)}
-                          className="p-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                          disabled={updatingId === sub.id}
+                          className="p-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

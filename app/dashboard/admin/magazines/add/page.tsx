@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Upload, FileText, Package, ImageIcon, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
+import toast from "react-hot-toast"
 
 export default function AddMagazinePage() {
   const router = useRouter()
@@ -14,7 +15,7 @@ export default function AddMagazinePage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [stock, setStock] = useState("") 
+  const [stock, setStock] = useState("")
 
   async function handleUpload(file: File) {
     const formData = new FormData()
@@ -30,9 +31,11 @@ export default function AddMagazinePage() {
     setLoading(true)
     setError("")
 
+    const toastId = toast.loading("Publishing magazine...")
+
     try {
       if (!coverImage || !pdfFile) throw new Error("Please upload both cover image and PDF")
-      
+
       // 1. Upload files to get URLs
       const coverUrl = await handleUpload(coverImage)
       const pdfUrl = await handleUpload(pdfFile)
@@ -41,23 +44,26 @@ export default function AddMagazinePage() {
       const res = await fetch("/api/admin/magazines", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          title, 
+        body: JSON.stringify({
+          title,
           description, // Included description
           price: parseFloat(price),
-          stock: parseInt(stock), 
-          coverImage: coverUrl, 
-          pdfUrl 
+          stock: parseInt(stock),
+          coverImage: coverUrl,
+          pdfUrl
         }),
       })
 
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed to create magazine")
 
+      toast.success("Magazine published successfully!", { id: toastId })
+
       router.push("/dashboard/admin")
       router.refresh() // Refresh the server stats
     } catch (err: any) {
       setError(err.message)
+      toast.error(err.message || "Failed to publish magazine", { id: toastId })
     } finally {
       setLoading(false)
     }
@@ -130,7 +136,7 @@ export default function AddMagazinePage() {
               </div>
             </div>
 
-               <div className="space-y-2">
+            <div className="space-y-2">
               <label className="block text-xs tracking-[2px] uppercase text-white/40 font-medium">
                 Stock Quantity
               </label>

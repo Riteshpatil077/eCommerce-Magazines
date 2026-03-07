@@ -184,6 +184,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock, BookOpen, Calendar, ChevronRight, AlertCircle } from "lucide-react";
 import DashboardCard from "@/app/components/user/DashboardCard";
+import CheckoutToast from "@/app/components/dashboard/CheckoutToast";
+import { Suspense } from "react";
 
 export default async function UserDashboard() {
   const user = await getUserFromToken();
@@ -214,10 +216,13 @@ export default async function UserDashboard() {
 
   return (
     <div className="space-y-8 bg-zinc-950 text-white min-h-screen p-4 md:p-8">
+      <Suspense fallback={null}>
+        <CheckoutToast />
+      </Suspense>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-serif font-bold text-zinc-100 italic tracking-tight">Your Collection</h2>
-          <p className="text-zinc-500 text-sm mt-1">Welcome back, {user.name}. Pick up where you left off.</p>
+          <p className="text-zinc-500 text-sm mt-1">Welcome back, {(user as any).name || "Reader"}. Pick up where you left off.</p>
         </div>
         <Link href="/store" className="bg-white/5 border border-white/10 hover:bg-white/10 px-6 py-2.5 rounded-full text-xs font-bold uppercase transition-all flex items-center gap-2 w-fit">
           <BookOpen className="w-4 h-4 text-amber-400" />
@@ -286,14 +291,14 @@ export default async function UserDashboard() {
 
                       <div className="flex items-center gap-3 text-zinc-400">
                         <Clock className="w-4 h-4 text-zinc-600" />
-                        <span className="text-xs font-medium italic">Jump to Page {sub.lastReadPage || 1}</span>
+                        <span className="text-xs font-medium italic">Jump to Page {(sub as any).lastReadPage || 1}</span>
                       </div>
                     </div>
 
                     {/* Footer Action */}
                     <div className="mt-auto pt-6 flex items-center justify-between">
                       <Link
-                        href={`/dashboard/read/${sub.magazine.slug}?page=${sub.lastReadPage || 1}`}
+                        href={`/dashboard/read/${sub.magazine.slug}?page=${(sub as any).lastReadPage || 1}`}
                         className="flex items-center gap-2 bg-amber-400 text-zinc-950 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-white transition-colors shadow-lg"
                       >
                         Read Issue <ChevronRight className="w-4 h-4" />

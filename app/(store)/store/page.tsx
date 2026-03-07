@@ -1,7 +1,6 @@
 import { prisma } from "@/app/lib/prisma"
 import Link from "next/link"
 import { BookOpen, ShoppingCart, Flame } from "lucide-react"
-import { addToCart } from "@/app/actions/cart.actions"
 import { unstable_cache } from "next/cache"
 import Image from "next/image"
 import LogoutButton from "@/app/components/logout-btn"
@@ -9,8 +8,8 @@ import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import StoreSearch from "@/app/components/user/StoreSearchProps"
 import MagazineGrid from "@/app/components/store/Magazinegrid"
-// 1. Import Toaster
-import { Toaster } from "react-hot-toast"
+import { AddToCartButton } from "@/app/components/cart/AddToCartButton"
+
 
 const getMagazines = unstable_cache(
   async () => prisma.magazine.findMany({
@@ -62,23 +61,6 @@ export default async function StorePage() {
 
   return (
     <div className="bg-zinc-950 text-stone-100 min-h-screen selection:bg-amber-400 selection:text-zinc-950">
-
-      {/* 2. Add Toaster with matching theme */}
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            background: '#18181b',
-            color: '#fafaf9',
-            border: '1px solid rgba(251, 191, 36, 0.1)',
-            fontSize: '12px',
-            borderRadius: '12px'
-          },
-          success: {
-            iconTheme: { primary: '#fbbf24', secondary: '#18181b' }
-          }
-        }}
-      />
 
       <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl">
         {/* ... Navbar Content Unchanged ... */}
@@ -146,15 +128,13 @@ export default async function StorePage() {
                   {subSet.has(featured.id) ? "Continue Reading" : "Explore Issue"}
                 </Link>
 
-                {/* 3. Wrap action in a component that supports toasts or use a Client Component */}
                 {!subSet.has(featured.id) && (
-                  <form action={addToCart}>
-                    <input type="hidden" name="magazineId" value={featured.id} />
-                    <button type="submit" className="flex items-center gap-2 border border-white/20 hover:border-white/40 text-white/70 hover:text-stone-100 px-6 py-3.5 rounded-2xl text-sm transition-all">
-                      <ShoppingCart className="w-4 h-4" strokeWidth={1.5} />
-                      ₹{featured.price} / mo
-                    </button>
-                  </form>
+                  <AddToCartButton
+                    magazineId={featured.id}
+                    title={featured.title}
+                    price={featured.price}
+                    className="flex items-center gap-2 border border-white/20 hover:border-white/40 text-white/70 hover:text-stone-100 px-6 py-3.5 rounded-2xl text-sm transition-all"
+                  />
                 )}
               </div>
             </div>

@@ -1,34 +1,40 @@
 "use client"
 
-import { useFormStatus } from "react-dom"
+import { useState } from "react"
 import { Trash2, Loader2 } from "lucide-react"
-import { useEffect, useRef } from "react"
 import toast from "react-hot-toast"
+import { removeFromCart } from "@/app/actions/cart.actions"
 
-export function RemoveButton() {
-    const { pending } = useFormStatus()
-    // We use a ref to track the previous state so we only toast once when finishing
-    const wasPending = useRef(false)
+export function RemoveButton({ cartId }: { cartId: string }) {
+    const [pending, setPending] = useState(false)
 
-    useEffect(() => {
-        // If it was pending and now it's not, the item was removed
-        if (wasPending.current && !pending) {
+    const handleRemove = async () => {
+        setPending(true)
+        const toastId = toast.loading("Removing item...")
+        try {
+            await removeFromCart(cartId)
             toast.success("Item removed from cart", {
+                id: toastId,
                 icon: '🗑️',
                 style: {
                     background: '#18181b',
-                    color: '#fb7185', // rose-400 to match your hover color
+                    color: '#fb7185',
                     border: '1px solid rgba(251, 113, 133, 0.2)'
                 }
             })
+        } catch (err) {
+            toast.error("Failed to remove item", { id: toastId })
+        } finally {
+            setPending(false)
         }
-        // Update the ref for the next render
-        wasPending.current = pending
-    }, [pending])
+    }
+
+
 
     return (
         <button
-            type="submit"
+            type="button"
+            onClick={handleRemove}
             disabled={pending}
             className="flex items-center gap-2 text-white/20 hover:text-rose-400 transition-colors py-2 px-3 rounded-lg hover:bg-rose-400/5 disabled:opacity-50 disabled:cursor-not-allowed group"
         >

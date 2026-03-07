@@ -2,8 +2,7 @@ import UserSearch from "@/app/components/dashboard/UserSearch"
 import { prisma } from "@/app/lib/prisma"
 import { Users, UserIcon } from "lucide-react"
 import DeleteUserButton from "@/app/components/dashboard/DeleteUserButton"
-// 1. Import Toaster and the Client component helper
-import { Toaster } from "react-hot-toast"
+// 1. Removed Toaster as it is centrally provided
 
 export default async function UsersPage({
   searchParams,
@@ -31,27 +30,6 @@ export default async function UsersPage({
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 p-8 md:p-12">
-      {/* 2. Toaster configured with your UI theme */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#18181b', // zinc-900
-            color: '#fafaf9',      // stone-50
-            border: '1px solid rgba(251, 191, 36, 0.2)', // amber-400/20
-            fontSize: '12px',
-            letterSpacing: '1px',
-            textTransform: 'uppercase'
-          },
-          success: {
-            iconTheme: {
-              primary: '#fbbf24', // amber-400
-              secondary: '#18181b',
-            },
-          },
-        }}
-      />
 
       <div className="mb-10">
         <p className="flex items-center gap-2 text-[11px] tracking-[3px] uppercase text-amber-400 mb-3 font-medium">
