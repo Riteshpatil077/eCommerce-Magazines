@@ -47,7 +47,7 @@ export default async function DashboardLayout({
 
   // 2. Logic to get the Initial: Name first, then Email, then 'U'
   const userInitial = (dbUser?.name?.[0] || decoded.email?.[0] || "U").toUpperCase()
-  
+
   // Display name for the UI (Name or email prefix)
   const displayName = dbUser?.name || decoded.email?.split('@')[0]
 

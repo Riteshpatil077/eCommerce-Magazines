@@ -56,6 +56,34 @@ export async function processOrder(formData: FormData) {
                 },
             },
         });
+        for (const item of cartItems) {
+            const startDate = new Date();
+            const expiryDate = new Date();
+            expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+            await tx.subscription.upsert({
+                where: {
+                    userId_magazineId: {
+                        userId: userId,
+                        magazineId: item.magazineId,
+                    },
+                },
+                update: {
+                    isActive: false,
+                    paymentStatus: "PENDING",
+                    startDate,
+                    expiryDate,
+                },
+                create: {
+                    userId: userId,
+                    magazineId: item.magazineId,
+                    isActive: false,
+                    paymentStatus: "PENDING",
+                    startDate,
+                    expiryDate,
+                },
+            });
+        }
 
         // 3. Clear the user's cart
         await tx.cart.deleteMany({
@@ -65,5 +93,5 @@ export async function processOrder(formData: FormData) {
 
 
     // 3. Redirect to a success page
-    redirect("/store/success")
+    redirect("/dashboard/user?status=pending")
 }

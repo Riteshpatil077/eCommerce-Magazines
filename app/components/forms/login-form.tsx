@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from "react" // Added useEffect
 import { loginAction } from "@/app/actions/auth.actions"
-import toast from "react-hot-toast"
+import { toast } from "react-hot-toast"
 import Link from "next/link"
 import { Mail, Lock, ArrowRight, BookOpen, Loader2 } from "lucide-react" // Added Loader2
 
@@ -12,6 +12,9 @@ export default function LoginForm() {
   useEffect(() => {
     if (state?.error) {
       toast.error(state.error)
+    }
+    else if (state && !state.error) {
+      toast.success("Login successful")
     }
   }, [state])
 

@@ -2,7 +2,8 @@ import UserSearch from "@/app/components/dashboard/UserSearch"
 import { prisma } from "@/app/lib/prisma"
 import { Users, ShieldCheck, UserIcon } from "lucide-react"
 import DeleteUserButton from "@/app/components/dashboard/DeleteUserButton"
-
+// 1. Import Toaster and the Client component helper
+import { Toaster } from "react-hot-toast"
 
 export default async function UsersPage({
   searchParams,
@@ -11,7 +12,6 @@ export default async function UsersPage({
 }) {
   const { query } = await searchParams
 
-  // Optimized Search: Filtering happens in the Database, not the browser
   const users = await prisma.user.findMany({
     where: query ? {
       OR: [
@@ -22,12 +22,30 @@ export default async function UsersPage({
     orderBy: { createdAt: 'desc' }
   })
 
-  const admins = users.filter((u) => u.role === "ADMIN").length
-  const members = users.length - admins
-
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-100 p-8 md:p-12">
-      {/* Header unchanged ... */}
+      {/* 2. Toaster configured with your UI theme */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#18181b', // zinc-900
+            color: '#fafaf9',      // stone-50
+            border: '1px solid rgba(251, 191, 36, 0.2)', // amber-400/20
+            fontSize: '12px',
+            letterSpacing: '1px',
+            textTransform: 'uppercase'
+          },
+          success: {
+            iconTheme: {
+              primary: '#fbbf24', // amber-400
+              secondary: '#18181b',
+            },
+          },
+        }}
+      />
+
       <div className="mb-10">
         <p className="flex items-center gap-2 text-[11px] tracking-[3px] uppercase text-amber-400 mb-3 font-medium">
           <span className="block w-6 h-px bg-amber-400" />
@@ -38,20 +56,15 @@ export default async function UsersPage({
         </h1>
       </div>
 
-      {/* New Search Component */}
       <UserSearch />
 
-      {/* Summary pills */}
       <div className="flex items-center gap-3 mb-6">
         <span className="text-xs text-white/40 bg-white/5 border border-white/5 px-3 py-1.5 rounded-full">
           {users.length} {query ? "found" : "total"}
         </span>
-        {/* ... other pills ... */}
       </div>
 
-      {/* Table Section */}
       <div className="bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden">
-        {/* Adjusted Grid: col-span-3 for Email/Role to fit Actions */}
         <div className="grid grid-cols-12 px-6 py-3 border-b border-white/5 bg-zinc-800/40 text-[10px] tracking-[2px] uppercase text-white/25 font-medium">
           <span className="col-span-1">#</span>
           <span className="col-span-4">User</span>
@@ -95,8 +108,8 @@ export default async function UsersPage({
                     </span>
                   </div>
 
-                  {/* New Delete Action Column */}
                   <div className="col-span-1 flex justify-end">
+                    {/* The toast will be triggered inside this component */}
                     <DeleteUserButton userId={user.id} />
                   </div>
                 </div>

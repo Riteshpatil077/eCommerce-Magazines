@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast"
+import ToastProvider from "./components/ToastProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Pressly",
   description: "Pressly is a modern digital magazine platform where users can explore, subscribe, and read premium magazines online with seamless access and secure payments.",
-    keywords: [
+  keywords: [
     "digital magazines",
     "online magazine subscription",
     "read magazines online",
@@ -34,7 +34,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-gray-50">
         {children}
-        <Toaster position="top-right" />
+        <ToastProvider />
       </body>
     </html>
   )
