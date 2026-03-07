@@ -9,9 +9,6 @@ export async function deleteMagazine(id: string) {
     });
 
     // 2. Clear the specific cache tag used in the Store Page
-    revalidateTag("magazines-list");
-
-    // 3. (Optional) Revalidate the paths directly
     revalidatePath("/store");
     revalidatePath("/dashboard/admin/magazines");
 }

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { ShoppingCart } from "lucide-react"
 import { addToCart } from "@/app/actions/cart.actions"
 
-export default function Section({ id, title, magazines, subscribedIds }) {
+export default function Section({ id, title, magazines, subscribedIds }: any) {
 
     return (
         <div id={id} className="px-6 md:px-12 scroll-mt-24">
@@ -13,7 +13,7 @@ export default function Section({ id, title, magazines, subscribedIds }) {
 
             <div className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide snap-x">
 
-                {magazines.map((mag) => {
+                {magazines.map((mag: any) => {
 
                     const isSubscribed = subscribedIds.includes(mag.id)
 
@@ -37,7 +37,7 @@ export default function Section({ id, title, magazines, subscribedIds }) {
                                         Read
                                     </Link>
                                 ) : (
-                                    <form action={addToCart}>
+                                    <form action={addToCart as any}>
                                         <input type="hidden" name="magazineId" value={mag.id} />
                                         <button>Add to Cart</button>
                                     </form>

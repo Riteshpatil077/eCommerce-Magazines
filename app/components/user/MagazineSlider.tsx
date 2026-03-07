@@ -6,15 +6,15 @@ import Link from "next/image";
 import { ShoppingCart } from "lucide-react";
 import { addToCart } from "@/app/actions/cart.actions";
 
-export default function MagazineSlider({ 
-  magazines, 
-  subscribedIds, 
-  title, 
-  id 
-}: { 
-  magazines: any[]; 
-  subscribedIds: Set<string>; 
-  title: string; 
+export default function MagazineSlider({
+  magazines,
+  subscribedIds,
+  title,
+  id
+}: {
+  magazines: any[];
+  subscribedIds: Set<string>;
+  title: string;
   id: string;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -26,7 +26,7 @@ export default function MagazineSlider({
     const interval = setInterval(() => {
       if (scrollRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        
+
         // If we reached the end, snap back to start, else scroll right
         if (scrollLeft + clientWidth >= scrollWidth - 10) {
           scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
@@ -42,15 +42,15 @@ export default function MagazineSlider({
   if (magazines.length === 0) return null;
 
   return (
-    <div 
-      id={id} 
+    <div
+      id={id}
       className="px-6 md:px-12 scroll-mt-24"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       <h2 className="font-serif text-2xl md:text-3xl font-medium text-stone-100 mb-8">{title}</h2>
-      
-      <div 
+
+      <div
         ref={scrollRef}
         className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide snap-x no-scrollbar"
         style={{ scrollBehavior: 'smooth' }}
@@ -67,7 +67,7 @@ export default function MagazineSlider({
                 className="object-cover group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-80" />
-              
+
               {isSubscribed && (
                 <div className="absolute top-4 right-4 z-20">
                   <div className="bg-amber-400 text-zinc-950 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-tighter shadow-xl">
@@ -92,7 +92,7 @@ export default function MagazineSlider({
                     </a>
                   ) : (
                     <>
-                      <form action={addToCart}>
+                      <form action={addToCart as any}>
                         <input type="hidden" name="magazineId" value={mag.id} />
                         <button
                           type="submit"

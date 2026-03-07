@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 import * as jose from "jose" // Use 'jose' for middleware (it's faster & native-friendly)
 import jwt from "jsonwebtoken"
-export const runtime = "nodejs"
-
-export async function middleware(req: any) {
+export async function proxy(req: any) {
   const token = req.cookies.get("token")?.value
   const { pathname } = req.nextUrl
+
+  if (!pathname.startsWith("/dashboard")) {
+    return NextResponse.next()
+  }
 
   // 1. If no token, send to login
   if (!token) {
@@ -32,9 +34,4 @@ export async function middleware(req: any) {
     // Token is fake or expired
     return NextResponse.redirect(new URL("/login", req.url))
   }
-}
-
-export const config = {
-  // Protect all dashboard routes
-  matcher: ["/dashboard/:path*"]
 }

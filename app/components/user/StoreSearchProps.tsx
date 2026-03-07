@@ -455,7 +455,7 @@ export default function StoreSearch({ magazines, subscribedIds: subscribedIdsPro
                                                 </Link>
 
                                                 {!isSubscribed ? (
-                                                    <form action={addToCart} onSubmit={handleSelect}>
+                                                    <form action={addToCart as any} onSubmit={handleSelect}>
                                                         <input type="hidden" name="magazineId" value={mag.id} />
                                                         <button
                                                             type="submit"

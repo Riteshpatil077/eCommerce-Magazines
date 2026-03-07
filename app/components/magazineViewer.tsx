@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+const FlipBook = HTMLFlipBook as any;
+
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const PageContent = React.forwardRef<
@@ -131,7 +133,7 @@ export default function MagazineViewer({
                 >
                     {numPages > 0 && (
                         <div className="relative shadow-[0_0_80px_rgba(0,0,0,0.8)]">
-                            <HTMLFlipBook
+                            <FlipBook
                                 ref={bookRef}
                                 width={finalWidth}
                                 height={finalHeight}
@@ -140,7 +142,7 @@ export default function MagazineViewer({
                                 flippingTime={800}
                                 usePortrait={false}
                                 startPage={0}
-                                onFlip={(e) => {
+                                onFlip={(e: any) => {
                                     setCurrentPage(e.data);
                                     playFlipSound();
                                 }}
@@ -154,7 +156,7 @@ export default function MagazineViewer({
                                         height={finalHeight}
                                     />
                                 ))}
-                            </HTMLFlipBook>
+                            </FlipBook>
                         </div>
                     )}
                 </Document>
