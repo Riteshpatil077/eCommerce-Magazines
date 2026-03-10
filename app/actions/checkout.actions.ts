@@ -5,6 +5,10 @@ import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import { redirect } from "next/navigation"
 
+/**
+ * Authenticates the user by decoding the JWT from their cookies.
+ * @returns The user ID string if authenticated, or null if the token is missing/invalid.
+ */
 async function getUserId() {
     const token = (await cookies()).get("token")?.value
     if (!token) return null
@@ -16,11 +20,17 @@ async function getUserId() {
     }
 }
 
+/**
+ * Server Action: Completes a checkout flow for the user's entire cart.
+ * Moves cart items into a structured Order, creates pending Subscriptions, and flushes the cart.
+ * Executes completely inside an atomic Prisma Transaction for rollback safety.
+ * @param formData - The billing information securely passed from the checkout form.
+ */
 export async function processOrder(formData: FormData) {
     const userId = await getUserId()
     if (!userId) redirect("/login")
 
-    // Extract data from the billing form
+    // Extract billing inputs
     const name = formData.get("name") as string
     const address = formData.get("address") as string
     const phone = formData.get("phone") as string

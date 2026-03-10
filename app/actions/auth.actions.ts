@@ -8,6 +8,11 @@ import { redirect } from "next/navigation"
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from "@/app/lib/validations"
 import { sendEmail } from "@/app/lib/mail"
 
+/**
+ * Helper function to generate a JWT token for a user.
+ * @param user - The user object containing id and role.
+ * @returns A signed JWT token string valid for 1 day.
+ */
 function generateToken(user: any) {
   return jwt.sign(
     { id: user.id, role: user.role },
@@ -16,6 +21,10 @@ function generateToken(user: any) {
   )
 }
 
+/**
+ * Handles user registration.
+ * Validates input, hashes password, saves user to DB, and sets a JWT cookie.
+ */
 export async function registerAction(prevState: any, formData: FormData) {
   const data = Object.fromEntries(formData)
   const parsed = registerSchema.safeParse(data)
@@ -36,8 +45,6 @@ export async function registerAction(prevState: any, formData: FormData) {
   })
 
   const token = generateToken(user)
-
-
   const cookieStore = await cookies()
 
   cookieStore.set("token", token, {
@@ -48,10 +55,13 @@ export async function registerAction(prevState: any, formData: FormData) {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   })
 
-
   return { success: true, role: user.role };
 }
 
+/**
+ * Handles user login.
+ * Validates credentials and sets a JWT cookie upon success.
+ */
 export async function loginAction(prevState: any, formData: FormData) {
   const data = Object.fromEntries(formData)
   const parsed = loginSchema.safeParse(data)
@@ -69,8 +79,6 @@ export async function loginAction(prevState: any, formData: FormData) {
   if (!match) return { error: "Invalid credentials" }
 
   const token = generateToken(user)
-
-
   const cookieStore = await cookies()
 
   cookieStore.set("token", token, {
@@ -78,20 +86,26 @@ export async function loginAction(prevState: any, formData: FormData) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60 * 24 * 1, // 1 day
   })
 
   return { success: true, role: user.role };
 }
 
+/**
+ * Logs out the user by clearing the JWT auth token cookie.
+ */
 export async function logoutAction() {
   const cookieStore = await cookies()
-
   cookieStore.delete("token")
-
   redirect("/")
 }
 
+/**
+ * Initiates the forgot password flow.
+ * Generates an OTP, stores it in the database with an expiration time,
+ * and emails it directly to the user's provided email address.
+ */
 export async function forgotPasswordAction(prevState: any, formData: FormData) {
   const data = Object.fromEntries(formData)
   const parsed = forgotPasswordSchema.safeParse(data)
@@ -104,15 +118,15 @@ export async function forgotPasswordAction(prevState: any, formData: FormData) {
   const user = await prisma.user.findUnique({ where: { email } })
 
   if (!user) {
-    // Return success even if user doesn't exist to prevent email enumeration
+    // Return success even if user doesn't exist to prevent email enumeration attacks
     return { success: true, message: "If an account exists, an OTP has been sent." }
   }
 
-  // Generate 6 digit OTP
+  // Generate a random 6 digit OTP for the password reset sequence
   const otp = Math.floor(100000 + Math.random() * 900000).toString()
-  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000) // Valid for 10 minutes
 
-  // Save OTP to user
+  // Save OTP variables directly against the user model record
   await prisma.user.update({
     where: { id: user.id },
     data: {
@@ -121,7 +135,7 @@ export async function forgotPasswordAction(prevState: any, formData: FormData) {
     }
   })
 
-  // Send Email
+  // Dispatch standard nodemailer email using our custom utility
   const emailRes = await sendEmail({
     to: user.email,
     subject: "Password Reset OTP",
@@ -135,6 +149,11 @@ export async function forgotPasswordAction(prevState: any, formData: FormData) {
   return { success: true, message: "If an account exists, an OTP has been sent." }
 }
 
+/**
+ * Completes the forgot password flow.
+ * Verifies the submitted OTP against the database and expiration limits.
+ * If successful, securely updates the password and cleans up the OTP variables.
+ */
 export async function resetPasswordAction(prevState: any, formData: FormData) {
   const data = Object.fromEntries(formData)
   const parsed = resetPasswordSchema.safeParse(data)
@@ -153,7 +172,7 @@ export async function resetPasswordAction(prevState: any, formData: FormData) {
 
   const hashed = await bcrypt.hash(password, 10)
 
-  // Reset password and clear OTP
+  // Reset password to hash, and purge OTP parameters from record so they cannot be reused
   await prisma.user.update({
     where: { id: user.id },
     data: {

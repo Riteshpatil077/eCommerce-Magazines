@@ -9,7 +9,6 @@ import {
     ChevronRight,
     Volume2,
     VolumeX,
-    Maximize2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -44,9 +43,13 @@ const PageContent = React.forwardRef<
 
 PageContent.displayName = "PageContent";
 
+/**
+ * Main MagazineViewer component. 
+ * Renders a high-resolution, scaleable PDF interactive flipbook.
+ */
 export default function MagazineViewer({
     pdfUrl, slug,
-    fullscreen,
+    fullscreen, // Left intact for potential route-based fullscreen implementations later
 }: {
     pdfUrl: string;
     slug: string;
@@ -54,6 +57,7 @@ export default function MagazineViewer({
 }) {
     const router = useRouter();
 
+    // Core viewer state
     const [numPages, setNumPages] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [isMuted, setIsMuted] = useState(false);
@@ -61,7 +65,7 @@ export default function MagazineViewer({
     const [aspectRatio, setAspectRatio] = useState<number>(1.414); // Default to standard A4 (1:1.414)
     const [baseDimensions, setBaseDimensions] = useState({
         width: 450,
-        height: 450 * 1.414,
+        height: 636, // 450 * 1.414
     });
 
     const bookRef = useRef<any>(null);
@@ -113,23 +117,18 @@ export default function MagazineViewer({
         }
     }, [aspectRatio, fullscreenActive]);
 
+    // Ref for the main wrapper div
     const containerRef = useRef<HTMLDivElement | null>(null);
 
-    /* Enter fullscreen if query param exists or toggle via button */
+    /**
+     * Optional effect to trigger fullscreen on mount if `fullscreen` prop is true.
+     * Often used if redirecting to a strictly /full route.
+     */
     useEffect(() => {
         if (fullscreen && containerRef.current) {
             containerRef.current.requestFullscreen?.().catch(() => { });
         }
     }, [fullscreen]);
-
-    /* Toggle fullscreen on the current container */
-    const toggleFullscreen = () => {
-        if (!document.fullscreenElement) {
-            containerRef.current?.requestFullscreen?.().catch(() => { });
-        } else {
-            document.exitFullscreen?.().catch(() => { });
-        }
-    };
 
     const finalWidth = baseDimensions.width;
     const finalHeight = baseDimensions.height;
@@ -246,22 +245,6 @@ export default function MagazineViewer({
                     </div>
 
                     <div className="w-px h-6 bg-white/10 mx-2" />
-
-                    {/* FULLSCREEN */}
-
-                    {/*
-                    <button
-                        onClick={toggleFullscreen}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-xl text-amber-500"
-                    >
-                        <Maximize2 className="w-4 h-4" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">
-                            Full Window
-                        </span>
-                    </button>
-
-                    <div className="w-px h-6 bg-white/10 mx-2" />
-                    */}
 
                     {/* SOUND */}
 

@@ -1,7 +1,3 @@
-
-
-//testing
-
 "use server"
 
 import { prisma } from "@/app/lib/prisma"
@@ -10,6 +6,11 @@ import jwt from "jsonwebtoken"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 
+/**
+ * Server Action: Processes a user's subscription request for a specific magazine.
+ * Deducts 1 stock count, writes an upsert pending order record, and defines a 1-month expiry framework.
+ * @param formData - Raw HTML Form Data payload containing the target magazineId.
+ */
 export async function subscribeAction(formData: FormData) {
   const magazineId = formData.get("magazineId") as string
   const cookieStore = await cookies()

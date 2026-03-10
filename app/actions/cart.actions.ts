@@ -6,6 +6,10 @@ import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import { redirect } from "next/navigation"
 
+/**
+ * Helper securely extracts and verifies the user ID from the encrypted JWT token stored in cookies.
+ * @returns The decoded user object if authorized, otherwise null.
+ */
 async function getUserFromToken() {
     const cookieStore = await cookies()
     const token = cookieStore.get("token")?.value
@@ -19,6 +23,11 @@ async function getUserFromToken() {
     }
 }
 
+/**
+ * Server Action: Adds a magazine to the authenticated user's cart.
+ * Prevents duplicating magazines in the cart and subsequently refreshes UI cache.
+ * @param formData - Form data containing the magazineId from the client payload.
+ */
 export async function addToCart(formData: FormData) {
     const user = await getUserFromToken();
     if (!user) redirect("/login");
@@ -47,21 +56,19 @@ export async function addToCart(formData: FormData) {
         revalidatePath("/dashboard/user/cart");
         revalidatePath("/store");
 
-        // Return a success message instead of redirecting
+        // Return a JSON success flag to notify the toast/UI instead of rigidly redirecting a user
         return { success: true };
     } catch (err) {
         console.error("Cart Error:", err);
         return { error: "Database error occurred" };
     }
-
-    // // Perform revalidation and redirect OUTSIDE the try/catch
-    // if (shouldRedirect) {
-    //     revalidatePath("/dashboard/user/cart");
-    //     revalidatePath("/store");
-    //     redirect("/dashboard/user/cart");
-    // }
 }
 
+/**
+ * Server Action: Instantly removes a specific entry from the user's cart.
+ * Flushes cache upon deletion to update the frontend visual count immediately.
+ * @param cartId - the unique Cartesian primary key ID of the item to delete.
+ */
 export async function removeFromCart(cartId: string) {
     const user = await getUserFromToken()
     if (!user) redirect("/login")
