@@ -24,18 +24,20 @@ const PageContent = React.forwardRef<
     return (
         <div
             ref={ref}
-            className="bg-white flex justify-center shadow-2xl overflow-hidden"
+            className="bg-white overflow-hidden shadow-2xl"
             style={{ width: props.width, height: props.height }}
         >
-            <Page
-                pageNumber={props.pageNumber}
-                width={props.width}
-                height={props.height}
-                renderAnnotationLayer={false}
-                renderTextLayer={false}
-                devicePixelRatio={2}
-                loading={<div className="bg-zinc-800 animate-pulse w-full h-full" />}
-            />
+            <div className="w-full h-full relative">
+                <Page
+                    pageNumber={props.pageNumber}
+                    width={props.width}
+                    renderAnnotationLayer={false}
+                    renderTextLayer={false}
+                    devicePixelRatio={3}
+                    className="absolute inset-0 max-w-none"
+                    loading={<div className="bg-zinc-800/20 animate-pulse w-full h-full" />}
+                />
+            </div>
         </div>
     );
 });
@@ -56,115 +58,148 @@ export default function MagazineViewer({
     const [currentPage, setCurrentPage] = useState(0);
     const [isMuted, setIsMuted] = useState(false);
     const [scale, setScale] = useState(1);
+    const [aspectRatio, setAspectRatio] = useState<number>(1.414); // Default to standard A4 (1:1.414)
     const [baseDimensions, setBaseDimensions] = useState({
         width: 450,
-        height: 635,
+        height: 450 * 1.414,
     });
 
     const bookRef = useRef<any>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
+    const [fullscreenActive, setFullscreenActive] = useState(false);
+
+    /* Watch Fullscreen State */
+    useEffect(() => {
+        const onFullscreenChange = () => {
+            setFullscreenActive(!!document.fullscreenElement);
+        };
+        document.addEventListener("fullscreenchange", onFullscreenChange);
+        return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+    }, []);
+
     /* Resize book */
     useEffect(() => {
         const handleResize = () => {
-            const availableHeight = window.innerHeight - 180;
-            const availableWidth = window.innerWidth - 60;
+            // Give slightly more padding if not fullscreen, otherwise use maximum available
+            const heightOffset = fullscreenActive ? 120 : 180;
+            const widthOffset = fullscreenActive ? 40 : 60;
 
+            const cWidth = containerRef.current?.clientWidth || window.innerWidth;
+            const cHeight = containerRef.current?.clientHeight || window.innerHeight;
+
+            let availableHeight = (fullscreenActive ? window.innerHeight : cHeight) - heightOffset;
+            let availableWidth = (fullscreenActive ? window.innerWidth : cWidth) - widthOffset;
+
+            // Maximum bounds check
             const calcWidth = Math.min(
-                availableWidth / 2.1,
-                availableHeight / 1.41
+                availableWidth / 2.05, // Slight buffer (.05) prevents precision clipping on odd screen sizes
+                availableHeight / aspectRatio
             );
 
             setBaseDimensions({
                 width: calcWidth,
-                height: calcWidth * 1.41,
+                height: calcWidth * aspectRatio,
             });
         };
 
-        handleResize();
+        // Delay ensures reliable DOM measurements after fullscreen animations finish
+        const timeout = setTimeout(handleResize, 250);
         window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
 
-    /* Enter fullscreen if query param exists */
+        return () => {
+            clearTimeout(timeout);
+            window.removeEventListener("resize", handleResize);
+        }
+    }, [aspectRatio, fullscreenActive]);
+
+    const containerRef = useRef<HTMLDivElement | null>(null);
+
+    /* Enter fullscreen if query param exists or toggle via button */
     useEffect(() => {
-        if (fullscreen) {
-            const element = document.documentElement;
-
-            setTimeout(() => {
-                element.requestFullscreen?.().catch(() => { });
-            }, 300);
+        if (fullscreen && containerRef.current) {
+            containerRef.current.requestFullscreen?.().catch(() => { });
         }
     }, [fullscreen]);
 
-    /* Flip sound */
-    const playFlipSound = useCallback(() => {
-        if (!isMuted && audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(() => { });
+    /* Toggle fullscreen on the current container */
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            containerRef.current?.requestFullscreen?.().catch(() => { });
+        } else {
+            document.exitFullscreen?.().catch(() => { });
         }
-    }, [isMuted]);
-
-    /* Navigate to fullscreen reader page */
-    const openFullWindow = () => {
-        router.push(`/dashboard/read/${slug}?fullscreen=true`);
     };
 
-    const finalWidth = baseDimensions.width * scale;
-    const finalHeight = baseDimensions.height * scale;
+    const finalWidth = baseDimensions.width;
+    const finalHeight = baseDimensions.height;
 
     return (
-        <div className="flex flex-col h-full w-full bg-[#0c0c0c] overflow-hidden select-none">
-            <audio
-                ref={audioRef}
-                src="https://assets.mixkit.co/active_storage/sfx/2384/2384-preview.mp3"
-                preload="auto"
-            />
-
+        <div ref={containerRef} className="flex flex-col h-full w-full bg-[#0c0c0c] overflow-hidden select-none">
             {/* BOOK VIEWPORT */}
 
-            <div className="flex-1 w-full overflow-auto flex items-center justify-center p-4 custom-scrollbar">
-                <Document
-                    file={pdfUrl}
-                    onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                    loading={
-                        <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
-                    }
+            <div className="flex-1 min-h-0 w-full overflow-auto custom-scrollbar">
+                <div
+                    className="w-full h-full flex items-center justify-center min-w-max min-h-max transition-all duration-300 ease-out"
+                    style={{
+                        padding: `${Math.max(16, 16 + (finalHeight * (scale - 1)) / 2)}px ${Math.max(16, 16 + finalWidth * (scale - 1))}px`
+                    }}
                 >
-                    {numPages > 0 && (
-                        <div className="relative shadow-[0_0_80px_rgba(0,0,0,0.8)]">
-                            <FlipBook
-                                ref={bookRef}
-                                width={finalWidth}
-                                height={finalHeight}
-                                size="fixed"
-                                drawShadow={true}
-                                flippingTime={800}
-                                usePortrait={false}
-                                startPage={0}
-                                onFlip={(e: any) => {
-                                    setCurrentPage(e.data);
-                                    playFlipSound();
-                                }}
-                                className="magazine-book"
+                    <Document
+                        file={pdfUrl}
+                        onLoadSuccess={async (pdf) => {
+                            setNumPages(pdf.numPages);
+                            try {
+                                const page = await pdf.getPage(1);
+                                const viewport = page.getViewport({ scale: 1 });
+                                if (viewport.width && viewport.height) {
+                                    setAspectRatio(viewport.height / viewport.width);
+                                }
+                            } catch (error) {
+                                console.error("Error determining aspect ratio: ", error);
+                            }
+                        }}
+                        loading={
+                            <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
+                        }
+                    >
+                        {numPages > 0 && (
+                            <div
+                                className="relative shadow-[0_0_80px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-out origin-center"
+                                style={{ transform: `scale(${scale})` }}
                             >
-                                {[...Array(numPages).keys()].map((n) => (
-                                    <PageContent
-                                        key={n}
-                                        pageNumber={n + 1}
-                                        width={finalWidth}
-                                        height={finalHeight}
-                                    />
-                                ))}
-                            </FlipBook>
-                        </div>
-                    )}
-                </Document>
+                                <FlipBook
+                                    ref={bookRef}
+                                    width={finalWidth}
+                                    height={finalHeight}
+                                    size="fixed"
+                                    drawShadow={true}
+                                    flippingTime={800}
+                                    usePortrait={false}
+                                    startPage={0}
+                                    onFlip={(e: any) => {
+                                        setCurrentPage(e.data);
+                                    }}
+                                    className="magazine-book"
+                                >
+                                    {[...Array(numPages).keys()].map((n) => (
+                                        <PageContent
+                                            key={n}
+                                            pageNumber={n + 1}
+                                            width={finalWidth}
+                                            height={finalHeight}
+                                        />
+                                    ))}
+                                </FlipBook>
+                            </div>
+                        )}
+                    </Document>
+                </div>
             </div>
 
             {/* NAVIGATION BAR */}
 
-            <div className="h-24 w-full flex items-center justify-center px-6 z-30">
+            <div className="h-24 shrink-0 w-full flex items-center justify-center px-6 z-30">
                 <div className="flex items-center gap-4 bg-zinc-900/95 backdrop-blur-xl border border-white/10 px-5 py-2.5 rounded-2xl shadow-2xl">
 
                     <button
@@ -214,8 +249,9 @@ export default function MagazineViewer({
 
                     {/* FULLSCREEN */}
 
+                    {/*
                     <button
-                        onClick={openFullWindow}
+                        onClick={toggleFullscreen}
                         className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-xl text-amber-500"
                     >
                         <Maximize2 className="w-4 h-4" />
@@ -225,6 +261,7 @@ export default function MagazineViewer({
                     </button>
 
                     <div className="w-px h-6 bg-white/10 mx-2" />
+                    */}
 
                     {/* SOUND */}
 

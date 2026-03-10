@@ -4,6 +4,7 @@ import { getUserFromToken } from "@/app/lib/auth";
 import ClientViewerBridge from "@/app/components/ClientViewerBridge";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { pdfjs } from "react-pdf";
 export default async function ReadMagazinePage(props: {
     params: Promise<{ slug: string }>,
     searchParams: Promise<{ [key: string]: string | string[] | undefined }> // Add this
