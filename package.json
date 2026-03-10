@@ -12,6 +12,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
+    "@vercel/blob": "^2.3.1",
     "bcryptjs": "^3.0.3",
     "canvas": "^3.2.1",
     "datatables.net-dt": "^2.3.7",

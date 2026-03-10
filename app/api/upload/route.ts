@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
-import { writeFile, mkdir } from "fs/promises"
-import path from "path"
+//import { writeFile, mkdir } from "fs/promises"
+//import path from "path"
+import { put } from "@vercel/blob"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 
@@ -26,24 +27,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 })
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    const uploadDir = path.join(process.cwd(), "public/uploads")
-
-    // ✅ Ensure folder exists
-    await mkdir(uploadDir, { recursive: true })
-
-    const filePath = path.join(uploadDir, file.name)
-
-    await writeFile(filePath, buffer)
+    // Upload the file directly to Vercel Blob
+    const blob = await put(file.name, file, {
+      access: "public",
+    })
 
     return NextResponse.json({
       message: "Upload successful",
-      fileUrl: `/uploads/${file.name}`,
+      fileUrl: blob.url,
     })
   } catch (error) {
-    console.error("UPLOAD ERROR:", error) // <-- add this for debugging
+    console.error("UPLOAD ERROR:", error)
     return NextResponse.json({ error: "Upload failed" }, { status: 500 })
   }
 }
