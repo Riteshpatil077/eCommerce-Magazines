@@ -109,7 +109,7 @@ export default async function StorePage() {
         {/* ── Hero ── */}
         {featured && (
           <section className="relative h-[80vh] w-full overflow-hidden">
-            <Image src={featured.coverImage} alt={featured.title} fill priority sizes="100vw" className="object-cover object-[center_30%]" unoptimized />
+            <Image src={featured.coverImage} alt={featured.title} fill priority sizes="100vw" className="object-cover object-[center_30%]" />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/70 via-transparent to-transparent" />
 

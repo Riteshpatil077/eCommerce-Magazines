@@ -26,7 +26,17 @@ export default async function CartPage() {
 
     const cartItems = await prisma.cart.findMany({
         where: { userId: user.id },
-        include: { magazine: true },
+        include: {
+            magazine: {
+                select: {
+                    id: true,
+                    title: true,
+                    price: true,
+                    coverImage: true,
+                    stock: true
+                }
+            }
+        },
     })
 
     const totalAmount = cartItems.reduce((acc, item) => acc + item.magazine.price, 0)

@@ -18,24 +18,28 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.vers
 
 const PageContent = React.forwardRef<
     HTMLDivElement,
-    { pageNumber: number; width: number; height: number }
+    { pageNumber: number; width: number; height: number; isVisible: boolean }
 >((props, ref) => {
     return (
         <div
             ref={ref}
-            className="bg-white overflow-hidden shadow-2xl"
+            className="bg-zinc-100 overflow-hidden shadow-2xl"
             style={{ width: props.width, height: props.height }}
         >
-            <div className="w-full h-full relative">
-                <Page
-                    pageNumber={props.pageNumber}
-                    width={props.width}
-                    renderAnnotationLayer={false}
-                    renderTextLayer={false}
-                    devicePixelRatio={3}
-                    className="absolute inset-0 max-w-none"
-                    loading={<div className="bg-zinc-800/20 animate-pulse w-full h-full" />}
-                />
+            <div className="w-full h-full relative flex items-center justify-center">
+                {props.isVisible ? (
+                    <Page
+                        pageNumber={props.pageNumber}
+                        width={props.width}
+                        renderAnnotationLayer={false}
+                        renderTextLayer={false}
+                        devicePixelRatio={2} // Reduced from 3 to 2 to save ~50% Canvas Memory
+                        className="absolute inset-0 max-w-none"
+                        loading={<div className="bg-zinc-800/10 animate-pulse w-full h-full" />}
+                    />
+                ) : (
+                    <Loader2 className="w-8 h-8 animate-spin text-zinc-300" />
+                )}
             </div>
         </div>
     );
@@ -181,14 +185,21 @@ export default function MagazineViewer({
                                     }}
                                     className="magazine-book"
                                 >
-                                    {[...Array(numPages).keys()].map((n) => (
-                                        <PageContent
-                                            key={n}
-                                            pageNumber={n + 1}
-                                            width={finalWidth}
-                                            height={finalHeight}
-                                        />
-                                    ))}
+                                    {[...Array(numPages).keys()].map((n) => {
+                                        // Memory Optimization: Only actually mount the heavy PDF Canvas 
+                                        // for the pages immediately visible or 1 swipe away.
+                                        const isVisible = Math.abs(currentPage - n) <= 3;
+
+                                        return (
+                                            <PageContent
+                                                key={n}
+                                                pageNumber={n + 1}
+                                                width={finalWidth}
+                                                height={finalHeight}
+                                                isVisible={isVisible}
+                                            />
+                                        );
+                                    })}
                                 </FlipBook>
                             </div>
                         )}

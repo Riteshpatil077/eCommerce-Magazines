@@ -36,10 +36,15 @@ export async function processOrder(formData: FormData) {
     const phone = formData.get("phone") as string
     const zip = formData.get("zip") as string
 
-    // 1. Fetch current cart items
     const cartItems = await prisma.cart.findMany({
         where: { userId },
-        include: { magazine: true }
+        include: {
+            magazine: {
+                select: {
+                    price: true
+                }
+            }
+        }
     });
 
     if (cartItems.length === 0) {

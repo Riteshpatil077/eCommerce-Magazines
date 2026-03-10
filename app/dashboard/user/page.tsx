@@ -197,7 +197,16 @@ export default async function UserDashboard() {
       isActive: true,
       paymentStatus: "APPROVED"
     },
-    include: { magazine: true },
+    include: {
+      magazine: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          coverImage: true,
+        }
+      }
+    },
     orderBy: { createdAt: "desc" },
   });
 

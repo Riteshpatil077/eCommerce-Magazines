@@ -5,6 +5,7 @@ import type { NextConfig } from "next";
 /** @type {import('next').Next.config} */
 const nextConfig: NextConfig = {
   devIndicators: false,
+  productionBrowserSourceMaps: false,
   images: {
     remotePatterns: [
       {
