@@ -303,7 +303,7 @@ export default function MagazineViewer({
 
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const flipRef = useRef<PageFlip | null>(null);
+    const flipRef = useRef<any>(null);
 
     const [loading, setLoading] = useState(true);
     const [numPages, setNumPages] = useState(0);
